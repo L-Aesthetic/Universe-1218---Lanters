@@ -1602,8 +1602,15 @@ input:focus-visible {
   color: #a7b9af;
 }
 
-.archive-records {
+.archive-workspace {
+  display: grid;
+  gap: 30px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
   margin-top: 24px;
+}
+
+.archive-records {
+  margin-top: 0;
 }
 
 .archive-record {
@@ -1624,8 +1631,14 @@ button.archive-record {
   cursor: pointer;
 }
 
-button.archive-record:hover {
-  background: linear-gradient(90deg, rgba(98, 255, 159, 0.045), transparent);
+button.archive-record:hover,
+.archive-record--active {
+  background: linear-gradient(90deg, rgba(98, 255, 159, 0.07), transparent);
+}
+
+.archive-record--active {
+  box-shadow: inset 2px 0 0 var(--green);
+  padding-left: 12px;
 }
 
 .archive-record > span,
@@ -1678,6 +1691,50 @@ button.archive-record:hover {
   border: 1px solid rgba(98, 255, 159, 0.25);
   margin-top: 18px;
   padding: 22px 16px;
+}
+
+.archive-inspector {
+  align-self: start;
+  background: rgba(4, 15, 9, 0.72);
+  border: 1px solid var(--line);
+  min-height: 360px;
+  padding: 24px;
+  position: sticky;
+  top: 96px;
+}
+
+.archive-inspector h3 {
+  font-size: clamp(1.8rem, 3vw, 3.4rem);
+  font-weight: 480;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  margin: 14px 0 18px;
+}
+
+.archive-inspector > p {
+  color: #9eafa5;
+  line-height: 1.65;
+}
+
+.archive-inspector ul {
+  list-style: none;
+  margin: 24px 0;
+  padding: 0;
+}
+
+.archive-inspector li {
+  border-top: 1px solid var(--line);
+  color: #afc0b6;
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  line-height: 1.55;
+  padding: 11px 0;
+}
+
+.archive-inspector li::before {
+  color: var(--green);
+  content: "·";
+  margin-right: 8px;
 }
 
 .sector-field {
@@ -1753,6 +1810,12 @@ button.archive-record:hover {
   animation: ping 1.8s infinite;
 }
 
+.sector-node-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .sector-node-list {
   display: flex;
   flex-direction: column;
@@ -1771,8 +1834,14 @@ button.archive-record:hover {
   text-align: left;
 }
 
-.sector-node-list button:hover {
+.sector-node-list button:hover,
+.sector-node-list button.active {
+  background: linear-gradient(90deg, rgba(98, 255, 159, 0.05), transparent);
   padding-left: 8px;
+}
+
+.sector-node-list button.active {
+  box-shadow: inset 2px 0 0 var(--green);
 }
 
 .sector-node-list span {
@@ -1800,6 +1869,55 @@ button.archive-record:hover {
   color: var(--green);
   font-size: 0.48rem;
   font-style: normal;
+}
+
+.sector-inspector {
+  background: rgba(5, 16, 10, 0.72);
+  border: 1px solid var(--line);
+  padding: 20px;
+}
+
+.sector-inspector small,
+.sector-inspector b,
+.sector-inspector span {
+  display: block;
+  font-family: var(--mono);
+}
+
+.sector-inspector small {
+  color: var(--muted);
+  font-size: 0.47rem;
+  letter-spacing: 0.08em;
+}
+
+.sector-inspector b {
+  color: var(--green-soft);
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+.sector-inspector p {
+  color: #a7b8ae;
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+.sector-inspector span {
+  color: var(--green);
+  font-size: 0.48rem;
+  margin-bottom: 16px;
+}
+
+.sector-inspector em {
+  border-top: 1px solid var(--line);
+  color: #a9bbb0;
+  display: block;
+  font-size: 0.77rem;
+  font-style: normal;
+  line-height: 1.55;
+  padding-top: 16px;
 }
 
 .construct-layout {
@@ -2115,8 +2233,13 @@ button.archive-record:hover {
 
   .field-case-grid,
   .sector-field,
-  .construct-layout {
+  .construct-layout,
+  .archive-workspace {
     grid-template-columns: 1fr;
+  }
+
+  .archive-inspector {
+    position: static;
   }
 
   .sector-radar {
