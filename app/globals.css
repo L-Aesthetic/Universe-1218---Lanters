@@ -1677,6 +1677,162 @@ input:focus-visible {
   color: #a7b9af;
 }
 
+.waveform-console {
+  background: #020805;
+  border: 1px solid var(--line);
+  margin-top: 34px;
+  padding: 20px;
+}
+
+.waveform-console--matched {
+  border-color: rgba(98, 255, 159, 0.42);
+  box-shadow: inset 0 0 42px rgba(98, 255, 159, 0.025);
+}
+
+.waveform-console__header {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.waveform-console__header span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.waveform-console__header small,
+.waveform-console__header b,
+.waveform-console__result small,
+.waveform-console__result b {
+  font-family: var(--mono);
+}
+
+.waveform-console__header small,
+.waveform-console__result small {
+  color: var(--muted);
+  font-size: 0.46rem;
+  letter-spacing: 0.08em;
+}
+
+.waveform-console__header b {
+  color: var(--green-soft);
+  font-size: 0.55rem;
+}
+
+.waveform-plot {
+  background:
+    linear-gradient(rgba(98, 255, 159, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(98, 255, 159, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+  height: 180px;
+  margin: 18px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.waveform {
+  background:
+    linear-gradient(90deg,
+      transparent 0 3%,
+      var(--green) 3% 4%,
+      transparent 4% 8%,
+      var(--green) 8% 9%,
+      transparent 9% 15%,
+      var(--green) 15% 16%,
+      transparent 16% 22%,
+      var(--green) 22% 23%,
+      transparent 23% 31%,
+      var(--green) 31% 32%,
+      transparent 32% 39%,
+      var(--green) 39% 40%,
+      transparent 40% 49%,
+      var(--green) 49% 50%,
+      transparent 50% 61%,
+      var(--green) 61% 62%,
+      transparent 62% 71%,
+      var(--green) 71% 72%,
+      transparent 72% 82%,
+      var(--green) 82% 83%,
+      transparent 83% 100%);
+  clip-path: polygon(
+    0 52%, 4% 52%, 7% 38%, 10% 65%, 14% 48%, 18% 50%, 22% 26%,
+    26% 72%, 30% 43%, 34% 49%, 39% 20%, 43% 78%, 47% 45%, 52% 52%,
+    58% 34%, 63% 68%, 68% 45%, 73% 52%, 78% 30%, 83% 70%, 88% 48%,
+    94% 53%, 100% 49%, 100% 55%, 94% 59%, 88% 54%, 83% 77%, 78% 37%,
+    73% 58%, 68% 51%, 63% 75%, 58% 41%, 52% 58%, 47% 51%, 43% 85%,
+    39% 27%, 34% 55%, 30% 49%, 26% 79%, 22% 33%, 18% 56%, 14% 54%,
+    10% 71%, 7% 44%, 4% 58%, 0 58%
+  );
+  height: 100%;
+  inset: 0;
+  opacity: 0.62;
+  position: absolute;
+}
+
+.waveform--historic {
+  opacity: 0.18;
+  transform: translateY(9px) scaleY(0.92);
+}
+
+.waveform-console--matched .waveform--historic {
+  animation: waveformAlign 0.8s ease forwards;
+  opacity: 0.52;
+}
+
+.waveform-marker {
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--green);
+  height: 5px;
+  opacity: 0.2;
+  position: absolute;
+  top: 50%;
+  width: 5px;
+}
+
+.waveform-console--matched .waveform-marker {
+  opacity: 1;
+}
+
+.waveform-marker--a { left: 22%; }
+.waveform-marker--b { left: 49%; }
+.waveform-marker--c { left: 82%; }
+
+.waveform-console__result {
+  align-items: start;
+  display: grid;
+  gap: 22px;
+  grid-template-columns: auto 1fr;
+}
+
+.waveform-console__result span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.waveform-console__result b {
+  color: var(--green);
+  font-size: 1rem;
+}
+
+.waveform-console__result p {
+  color: #9fb1a6;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+@keyframes waveformAlign {
+  to {
+    opacity: 0.52;
+    transform: translateY(1px) scaleY(1.01);
+  }
+}
+
 .archive-workspace {
   display: grid;
   gap: 30px;
@@ -2527,6 +2683,15 @@ button.archive-record:hover,
 
   .field-case-grid {
     gap: 28px;
+  }
+
+  .waveform-console__header,
+  .waveform-console__result {
+    grid-template-columns: 1fr;
+  }
+
+  .waveform-plot {
+    height: 150px;
   }
 
   .field-case-grid dl div {
