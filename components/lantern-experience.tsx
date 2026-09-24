@@ -2,35 +2,26 @@
 
 import { useEffect, useState } from "react";
 
-type Phase = "boot" | "archive" | "case" | "selection" | "lantern";
-type EvidenceId = "scene" | "witness" | "record";
-type RingSystem = "record" | "case" | "archive" | "sector" | "construct";
-type ConstructKind = "shield" | "bridge" | "beacon";
-type ArchiveRecordId = EvidenceId | "prior";
-type SectorNodeId = "sol" | "oa" | "relay" | "dark";
-
-type Evidence = {
-  id: EvidenceId;
-  index: string;
-  label: string;
-  title: string;
-  summary: string;
-  detail: string[];
-  status: "verified" | "conflict" | "restricted";
-};
-
-type PersistedState = {
-  phase: Phase;
-  reviewed: EvidenceId[];
-  lanternName?: string;
-  ringSerial?: string;
-  correlated?: boolean;
-};
-
-const STORAGE_KEY = "u1218-lantern-state-v1";
-const PLACEHOLDER_SERIAL = "2814-00000000";
-const VALID_PHASES: Phase[] = ["boot", "archive", "case", "selection", "lantern"];
-const VALID_EVIDENCE_IDS: EvidenceId[] = ["scene", "witness", "record"];
+import {
+  PLACEHOLDER_SERIAL,
+  STORAGE_KEY,
+  VALID_EVIDENCE_IDS,
+  VALID_PHASES,
+  constructPrograms,
+  evidence,
+  sectorNodes,
+} from "../lib/lanterns/data";
+import { createRingSerial, ringFeedback } from "../lib/lanterns/device";
+import type {
+  ArchiveRecordId,
+  ConstructKind,
+  Evidence,
+  EvidenceId,
+  PersistedState,
+  Phase,
+  RingSystem,
+  SectorNodeId,
+} from "../lib/lanterns/types";
 
 function isPhase(value: unknown): value is Phase {
   return typeof value === "string" && VALID_PHASES.includes(value as Phase);
@@ -42,129 +33,6 @@ function isEvidenceId(value: unknown): value is EvidenceId {
     VALID_EVIDENCE_IDS.includes(value as EvidenceId)
   );
 }
-
-function createRingSerial() {
-  const random = new Uint32Array(1);
-  window.crypto.getRandomValues(random);
-  return `2814-${String(random[0] % 100000000).padStart(8, "0")}`;
-}
-
-const sectorNodes = [
-  { id: "sol", name: "SOL", detail: "LOCAL SYSTEM // EARTH", status: "ACTIVE" },
-  { id: "oa", name: "OA", detail: "CORPS CENTRAL // ROUTE CLASSIFIED", status: "LINKED" },
-  { id: "relay", name: "RELAY 2814-04", detail: "DEEP-SPACE ARCHIVE RELAY", status: "ONLINE" },
-  { id: "dark", name: "UNKNOWN CONTACT", detail: "BEARING 044.18 // DISTANCE UNRESOLVED", status: "UNRESOLVED" },
-] as const;
-
-const constructPrograms: Record<ConstructKind, { name: string; purpose: string; note: string }> = {
-  shield: {
-    name: "DEFENSIVE SHIELD",
-    purpose: "Disperse frontal impact across a continuous energy surface.",
-    note: "Stable. Low complexity. Suitable for first-form training.",
-  },
-  bridge: {
-    name: "LOAD-BEARING BRIDGE",
-    purpose: "Carry distributed weight across an unsupported span.",
-    note: "Structural members must resolve load before the surface is filled.",
-  },
-  beacon: {
-    name: "DISTRESS BEACON",
-    purpose: "Broadcast a Corps-recognizable emergency signature.",
-    note: "Non-combat construct. High persistence, low energy demand.",
-  },
-};
-
-function ringFeedback(kind: "soft" | "confirm" | "alert") {
-  if (typeof window === "undefined") return;
-
-  if ("vibrate" in navigator) {
-    navigator.vibrate(
-      kind === "alert" ? [18, 32, 26] : kind === "confirm" ? [12, 18, 22] : 8,
-    );
-  }
-
-  try {
-    const audio = new AudioContext();
-    const oscillator = audio.createOscillator();
-    const gain = audio.createGain();
-    const now = audio.currentTime;
-
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(
-      kind === "alert" ? 180 : kind === "confirm" ? 420 : 320,
-      now,
-    );
-    oscillator.frequency.exponentialRampToValueAtTime(
-      kind === "alert" ? 92 : kind === "confirm" ? 720 : 410,
-      now + 0.16,
-    );
-
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(kind === "confirm" ? 0.055 : 0.03, now + 0.018);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-
-    oscillator.connect(gain);
-    gain.connect(audio.destination);
-    oscillator.start(now);
-    oscillator.stop(now + 0.22);
-    oscillator.addEventListener("ended", () => {
-      void audio.close();
-    });
-  } catch {
-    // Sound is enhancement only; browser policy or device support may block it.
-  }
-}
-
-const evidence: Evidence[] = [
-  {
-    id: "scene",
-    index: "01",
-    label: "SCENE TELEMETRY",
-    title: "Energy trace",
-    summary:
-      "A 0.8 second emission was recorded four minutes before the body was discovered.",
-    detail: [
-      "Origin: 11.7 meters north of the victim.",
-      "Duration: 0.81 seconds.",
-      "Known Earth technology match: none.",
-      "Known Green Lantern ring signature match: none.",
-      "The trace ends without a corresponding departure vector.",
-    ],
-    status: "verified",
-  },
-  {
-    id: "witness",
-    index: "02",
-    label: "WITNESS STATEMENT",
-    title: "The light came first",
-    summary:
-      "A nearby witness places the anomalous light before the documented power failure.",
-    detail: [
-      "Witness reports a green-white flash at approximately 02:14.",
-      "Municipal grid records place the outage at 02:17.",
-      "Street camera metadata begins corrupting three minutes before the outage.",
-      "The witness could not identify a vehicle, aircraft, or person entering the scene.",
-      "The sequence conflicts with the official incident timeline.",
-    ],
-    status: "conflict",
-  },
-  {
-    id: "record",
-    index: "03",
-    label: "OAN RECORD",
-    title: "Prior contact",
-    summary:
-      "A sealed Corps record references the same waveform decades before the current incident.",
-    detail: [
-      "Archive family: Sector 2814 / anomalous contact.",
-      "Original assignment: restricted.",
-      "Outcome: restricted.",
-      "Lantern testimony: removed from public service record.",
-      "Reason for restriction: Guardian authorization required.",
-    ],
-    status: "restricted",
-  },
-];
 
 function LanternMark({ compact = false }: { compact?: boolean }) {
   return (
