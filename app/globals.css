@@ -763,8 +763,8 @@ input:focus-visible {
   border: 1px solid var(--line);
   color: var(--muted);
   font-family: var(--mono);
-  font-size: 0.45rem;
-  padding: 5px 6px;
+  font-size: 0.56rem;
+  padding: 5px 7px;
 }
 
 .evidence-card--reviewed .evidence-card__state {
@@ -2469,7 +2469,7 @@ button.archive-record:hover,
 
 .sector-inspector small {
   color: var(--muted);
-  font-size: 0.47rem;
+  font-size: 0.56rem;
   letter-spacing: 0.08em;
 }
 
@@ -2489,7 +2489,7 @@ button.archive-record:hover,
 
 .sector-inspector span {
   color: var(--green);
-  font-size: 0.48rem;
+  font-size: 0.56rem;
   margin-bottom: 16px;
 }
 
@@ -2531,13 +2531,13 @@ button.archive-record:hover,
 
 .sector-scan-result small {
   color: var(--muted);
-  font-size: 0.42rem;
+  font-size: 0.52rem;
   letter-spacing: 0.07em;
 }
 
 .sector-scan-result b {
   color: var(--green-soft);
-  font-size: 0.52rem;
+  font-size: 0.6rem;
   margin-top: 6px;
 }
 
@@ -2611,38 +2611,49 @@ button.archive-record:hover,
 }
 
 .construct--bridge .construct-part--one {
-  bottom: 24%;
-  height: 8px;
-  left: 8%;
-  transform: skewX(-16deg);
-  width: 84%;
+  bottom: 22%;
+  height: 54%;
+  left: 13%;
+  transform: skewX(-18deg);
+  transform-origin: bottom;
+  width: 10px;
 }
 
 .construct--bridge .construct-part--two {
-  bottom: 24%;
-  height: 52%;
-  left: 12%;
-  transform: skewX(-22deg);
-  width: 12px;
+  bottom: 22%;
+  height: 54%;
+  right: 13%;
+  transform: skewX(18deg);
+  transform-origin: bottom;
+  width: 10px;
 }
 
 .construct--bridge .construct-part--three {
-  bottom: 24%;
-  height: 52%;
-  right: 12%;
-  transform: skewX(22deg);
-  width: 12px;
-}
-
-.construct--bridge .construct-part--four {
   border-bottom: 0;
   border-left: 0;
   border-right: 0;
-  bottom: 43%;
+  bottom: 42%;
+  box-shadow:
+    42px -26px 0 -1px var(--green),
+    84px 0 0 -1px var(--green),
+    126px -26px 0 -1px var(--green);
   height: 1px;
-  left: 16%;
-  transform: rotate(-10deg);
-  width: 68%;
+  left: 19%;
+  transform: rotate(-8deg);
+  width: 62%;
+}
+
+.construct--bridge .construct-part--four {
+  background: linear-gradient(
+    180deg,
+    rgba(98, 255, 159, 0.18),
+    rgba(98, 255, 159, 0.03)
+  );
+  bottom: 20%;
+  height: 10px;
+  left: 8%;
+  transform: skewX(-14deg);
+  width: 84%;
 }
 
 .construct--beacon .construct-part--one {
