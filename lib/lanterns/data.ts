@@ -22,6 +22,12 @@ export const VALID_EVIDENCE_IDS: EvidenceId[] = [
   "record",
 ];
 
+export const VALID_CONSTRUCTS: ConstructKind[] = [
+  "shield",
+  "bridge",
+  "beacon",
+];
+
 export const evidence: Evidence[] = [
   {
     id: "scene",
