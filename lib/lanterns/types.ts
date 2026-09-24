@@ -19,6 +19,7 @@ export type PersistedState = {
   ringSerial?: string;
   correlated?: boolean;
   contactScanned?: boolean;
+  selectedAt?: string;
 };
 
 export type RingSystem =
