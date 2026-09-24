@@ -15,7 +15,10 @@ export type RecordOrigin = {
   note?: string;
 };
 
-export const ORIGINS = {
+export const ORIGINS: Record<
+  "dcCorps" | "dcJohn" | "lanternsPremise" | "u1218Adaptation" | "u1218Original",
+  RecordOrigin
+> = {
   dcCorps: {
     authority: "DC_OFFICIAL_REFERENCE",
     confidence: "verified",
@@ -52,7 +55,7 @@ export const ORIGINS = {
     note:
       "Created for this fan continuity; not presented as official DC canon.",
   },
-} satisfies Record<string, RecordOrigin>;
+};
 
 export const CASE_META = {
   id: "2814-E/001",
