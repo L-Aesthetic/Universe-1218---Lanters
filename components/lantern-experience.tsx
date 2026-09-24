@@ -6,6 +6,8 @@ type Phase = "boot" | "archive" | "case" | "selection" | "lantern";
 type EvidenceId = "scene" | "witness" | "record";
 type RingSystem = "record" | "case" | "archive" | "sector" | "construct";
 type ConstructKind = "shield" | "bridge" | "beacon";
+type ArchiveRecordId = EvidenceId | "prior";
+type SectorNodeId = "sol" | "oa" | "relay" | "dark";
 
 type Evidence = {
   id: EvidenceId;
@@ -499,7 +501,39 @@ function LanternScreen({
   const [system, setSystem] = useState<RingSystem>("record");
   const [construct, setConstruct] = useState<ConstructKind>("shield");
   const [constructPulse, setConstructPulse] = useState(0);
+  const [archiveRecord, setArchiveRecord] = useState<ArchiveRecordId>("prior");
+  const [sectorNode, setSectorNode] = useState<SectorNodeId>("sol");
   const hasName = lanternName.trim().length > 0;
+
+  const activeArchive =
+    archiveRecord === "prior"
+      ? {
+          label: "PRIOR CONTACT // NEW CLEARANCE",
+          title: "Record 2814-Δ/19",
+          summary:
+            "The same waveform was logged before either current Earth Lantern entered Corps service.",
+          detail: [
+            "Original Lantern assignment remains sealed.",
+            "Waveform correlation with current scene: 91.4%.",
+            "Incident location is not Earth.",
+            "Guardian seal was applied after the field report was filed.",
+            "The final 88% of this record remains inaccessible.",
+          ],
+          access: "UNSEALED 12%",
+        }
+      : (() => {
+          const item = evidence.find((entry) => entry.id === archiveRecord) ?? evidence[0];
+          return {
+            label: item.label,
+            title: item.title,
+            summary: item.summary,
+            detail: item.detail,
+            access: item.status === "restricted" ? "PARTIAL" : "VERIFIED",
+          };
+        })();
+
+  const activeSector =
+    sectorNodes.find((node) => node.id === sectorNode) ?? sectorNodes[0];
 
   const openSystem = (next: RingSystem) => {
     ringFeedback(next === "construct" ? "confirm" : "soft");
@@ -654,35 +688,59 @@ function LanternScreen({
                 </span>
                 <Classification value="LANTERN ACCESS" />
               </div>
-              <div className="archive-records">
-                {evidence.map((item) => (
+              <div className="archive-workspace">
+                <div className="archive-records">
+                  {evidence.map((item) => (
+                    <button
+                      type="button"
+                      key={item.id}
+                      onClick={() => {
+                        setArchiveRecord(item.id);
+                        ringFeedback("soft");
+                      }}
+                      className={`archive-record ${archiveRecord === item.id ? "archive-record--active" : ""}`}
+                    >
+                      <span>{item.index}</span>
+                      <div>
+                        <small>{item.label}</small>
+                        <b>{item.title}</b>
+                        <p>{item.summary}</p>
+                      </div>
+                      <i>{item.status === "restricted" ? "PARTIAL" : "VERIFIED"}</i>
+                    </button>
+                  ))}
                   <button
                     type="button"
-                    key={item.id}
-                    onClick={() => ringFeedback("soft")}
-                    className="archive-record"
+                    onClick={() => {
+                      setArchiveRecord("prior");
+                      ringFeedback("confirm");
+                    }}
+                    className={`archive-record archive-record--new ${archiveRecord === "prior" ? "archive-record--active" : ""}`}
                   >
-                    <span>{item.index}</span>
+                    <span>04</span>
                     <div>
-                      <small>{item.label}</small>
-                      <b>{item.title}</b>
-                      <p>{item.summary}</p>
+                      <small>PRIOR CONTACT // NEW CLEARANCE</small>
+                      <b>Record 2814-Δ/19</b>
+                      <p>
+                        The same waveform was logged before either current Earth
+                        Lantern entered Corps service.
+                      </p>
                     </div>
-                    <i>{item.status === "restricted" ? "PARTIAL" : "VERIFIED"}</i>
+                    <i>UNSEALED 12%</i>
                   </button>
-                ))}
-                <div className="archive-record archive-record--new">
-                  <span>04</span>
-                  <div>
-                    <small>PRIOR CONTACT // NEW CLEARANCE</small>
-                    <b>Record 2814-Δ/19</b>
-                    <p>
-                      The same waveform was logged before either current Earth
-                      Lantern entered Corps service.
-                    </p>
-                  </div>
-                  <i>UNSEALED 12%</i>
                 </div>
+
+                <aside className="archive-inspector">
+                  <div className="eyebrow">{activeArchive.label}</div>
+                  <h3>{activeArchive.title}</h3>
+                  <p>{activeArchive.summary}</p>
+                  <ul>
+                    {activeArchive.detail.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                  <Classification value={activeArchive.access} />
+                </aside>
               </div>
             </section>
           )}
@@ -707,16 +765,53 @@ function LanternScreen({
                   <i className="sector-point sector-point--relay" />
                   <i className="sector-point sector-point--unknown" />
                 </div>
-                <div className="sector-node-list">
-                  {sectorNodes.map((node) => (
-                    <button type="button" key={node.id} onClick={() => ringFeedback(node.id === "dark" ? "alert" : "soft")}>
-                      <span>
-                        <b>{node.name}</b>
-                        <small>{node.detail}</small>
-                      </span>
-                      <i>{node.status}</i>
-                    </button>
-                  ))}
+                <div className="sector-node-stack">
+                  <div className="sector-node-list">
+                    {sectorNodes.map((node) => (
+                      <button
+                        type="button"
+                        key={node.id}
+                        className={sectorNode === node.id ? "active" : ""}
+                        onClick={() => {
+                          setSectorNode(node.id as SectorNodeId);
+                          ringFeedback(node.id === "dark" ? "alert" : "soft");
+                        }}
+                      >
+                        <span>
+                          <b>{node.name}</b>
+                          <small>{node.detail}</small>
+                        </span>
+                        <i>{node.status}</i>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="sector-inspector">
+                    <small>SELECTED CONTACT</small>
+                    <b>{activeSector.name}</b>
+                    <p>{activeSector.detail}</p>
+                    <span>{activeSector.status}</span>
+                    {activeSector.id === "dark" ? (
+                      <em>
+                        Bearing remains fixed while distance changes. The ring
+                        cannot reconcile the contact with known local motion.
+                      </em>
+                    ) : activeSector.id === "oa" ? (
+                      <em>
+                        Direct route data is withheld from probationary Lantern
+                        clearance. Corps relay remains available.
+                      </em>
+                    ) : activeSector.id === "relay" ? (
+                      <em>
+                        Relay 2814-04 is carrying the archive session and your
+                        new ring identity.
+                      </em>
+                    ) : (
+                      <em>
+                        Earth is the current origin point for your ring link and
+                        Incident 2814-E/001.
+                      </em>
+                    )}
+                  </div>
                 </div>
               </div>
             </section>
