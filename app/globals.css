@@ -1321,6 +1321,21 @@ input:focus-visible {
   margin: 0;
 }
 
+.lantern-id-line > span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.lantern-id-line > span > small {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.43rem;
+  letter-spacing: 0.07em;
+}
+
+
+
 .lantern-id-line button {
   background: transparent;
   border: 0;
