@@ -4,14 +4,21 @@ export function createRingSerial() {
   return `2814-${String(random[0] % 100000000).padStart(8, "0")}`;
 }
 
-export function ringFeedback(kind: "soft" | "confirm" | "alert") {
+export function ringFeedback(
+  kind: "soft" | "confirm" | "alert",
+  options: { sound?: boolean; haptics?: boolean } = {},
+) {
   if (typeof window === "undefined") return;
 
-  if ("vibrate" in navigator) {
+  const { sound = true, haptics = true } = options;
+
+  if (haptics && "vibrate" in navigator) {
     navigator.vibrate(
       kind === "alert" ? [18, 32, 26] : kind === "confirm" ? [12, 18, 22] : 8,
     );
   }
+
+  if (!sound) return;
 
   try {
     const audio = new AudioContext();
