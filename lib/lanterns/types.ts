@@ -20,6 +20,7 @@ export type PersistedState = {
   correlated?: boolean;
   contactScanned?: boolean;
   selectedAt?: string;
+  constructsBuilt?: ConstructKind[];
 };
 
 export type RingSystem =
