@@ -447,8 +447,21 @@ function CaseScreen({
   );
 }
 
-function SelectionScreen({ onAccept }: { onAccept: () => void }) {
+function SelectionScreen({
+  reviewed,
+  onAccept,
+}: {
+  reviewed: EvidenceId[];
+  onAccept: () => void;
+}) {
   const [accepting, setAccepting] = useState(false);
+  const firstReviewed = evidence.find((item) => item.id === reviewed[0]) ?? evidence[0];
+  const firstAction =
+    firstReviewed.id === "witness"
+      ? "WITNESS TESTIMONY"
+      : firstReviewed.id === "record"
+        ? "RESTRICTED OAN RECORD"
+        : "PHYSICAL TELEMETRY";
 
   const accept = () => {
     if (accepting) return;
@@ -495,16 +508,16 @@ function SelectionScreen({ onAccept }: { onAccept: () => void }) {
 
         <div className="selection-receipts" aria-label="observer activity">
           <span>
-            <small>OFFICIAL SEQUENCE ACCEPTED</small>
-            <b>NO</b>
+            <small>FIRST INQUIRY</small>
+            <b>{firstAction}</b>
           </span>
           <span>
             <small>TIMELINE CONFLICT PURSUED</small>
             <b>YES</b>
           </span>
           <span>
-            <small>RESTRICTED RECORD EXAMINED</small>
-            <b>YES</b>
+            <small>OFFICIAL SEQUENCE ACCEPTED</small>
+            <b>NO</b>
           </span>
         </div>
 
@@ -1146,7 +1159,9 @@ export function LanternExperience() {
           }}
         />
       )}
-      {phase === "selection" && <SelectionScreen onAccept={acceptRing} />}
+      {phase === "selection" && (
+        <SelectionScreen reviewed={reviewed} onAccept={acceptRing} />
+      )}
       {phase === "lantern" && (
         <LanternScreen
           lanternName={lanternName}
