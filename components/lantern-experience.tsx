@@ -417,15 +417,19 @@ function LanternScreen({
   lanternName,
   ringSerial,
   correlated,
+  contactScanned,
   onSetName,
   onCorrelate,
+  onScanContact,
   onReset,
 }: {
   lanternName: string;
   ringSerial: string;
   correlated: boolean;
+  contactScanned: boolean;
   onSetName: (name: string) => void;
   onCorrelate: () => void;
+  onScanContact: () => void;
   onReset: () => void;
 }) {
   const [draftName, setDraftName] = useState(lanternName);
@@ -547,7 +551,7 @@ function LanternScreen({
                       </div>
                       {correlated ? (
                         <div className="service-log">
-                          <div className="eyebrow">SERVICE LOG // LATEST ENTRY</div>
+                          <div className="eyebrow">SERVICE LOG // FIELD RECORD</div>
                           <div>
                             <span>
                               <small>CASE</small>
@@ -561,6 +565,22 @@ function LanternScreen({
                               <small>RESULT</small>
                               <b>91.4% MATCH // OFF-WORLD ORIGIN</b>
                             </span>
+                            {contactScanned ? (
+                              <>
+                                <span>
+                                  <small>CASE</small>
+                                  <b>2814-E/001</b>
+                                </span>
+                                <span>
+                                  <small>ACTION</small>
+                                  <b>REMOTE CONTACT SCAN</b>
+                                </span>
+                                <span>
+                                  <small>RESULT</small>
+                                  <b>MULTIPLE ORIGINS // SINGLE SIGNATURE</b>
+                                </span>
+                              </>
+                            ) : null}
                           </div>
                         </div>
                       ) : null}
@@ -802,10 +822,32 @@ function LanternScreen({
                     <p>{activeSector.detail}</p>
                     <span>{activeSector.status}</span>
                     {activeSector.id === "dark" ? (
-                      <em>
-                        Bearing remains fixed while distance changes. The ring
-                        cannot reconcile the contact with known local motion.
-                      </em>
+                      <>
+                        <em>
+                          {contactScanned
+                            ? "The same signature is arriving from three incompatible coordinates. The ring classifies the contact as an echo, not a single object."
+                            : "Bearing remains fixed while distance changes. The ring cannot reconcile the contact with known local motion."}
+                        </em>
+                        {correlated && !contactScanned ? (
+                          <button
+                            type="button"
+                            className="system-link sector-scan-action"
+                            onClick={() => {
+                              onScanContact();
+                              ringFeedback("alert");
+                            }}
+                          >
+                            SCAN UNRESOLVED CONTACT <span>→</span>
+                          </button>
+                        ) : null}
+                        {contactScanned ? (
+                          <div className="sector-scan-result">
+                            <span><small>CONTACT TYPE</small><b>SPATIAL ECHO</b></span>
+                            <span><small>ORIGINS</small><b>03</b></span>
+                            <span><small>SIGNATURE</small><b>91.4% MATCH</b></span>
+                          </div>
+                        ) : null}
+                      </>
                     ) : activeSector.id === "oa" ? (
                       <em>
                         Direct route data is withheld from probationary Lantern
@@ -937,6 +979,7 @@ export function LanternExperience() {
   const [lanternName, setLanternName] = useState("");
   const [ringSerial, setRingSerial] = useState(PLACEHOLDER_SERIAL);
   const [correlated, setCorrelated] = useState(false);
+  const [contactScanned, setContactScanned] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -960,6 +1003,9 @@ export function LanternExperience() {
         if (typeof parsed.correlated === "boolean") {
           setCorrelated(parsed.correlated);
         }
+        if (typeof parsed.contactScanned === "boolean") {
+          setContactScanned(parsed.contactScanned);
+        }
       }
     } catch {
       // A corrupt local prototype state should never block entry.
@@ -976,9 +1022,18 @@ export function LanternExperience() {
       lanternName,
       ringSerial,
       correlated,
+      contactScanned,
     };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [correlated, hydrated, lanternName, phase, reviewed, ringSerial]);
+  }, [
+    contactScanned,
+    correlated,
+    hydrated,
+    lanternName,
+    phase,
+    reviewed,
+    ringSerial,
+  ]);
 
   const openEvidence = (id: EvidenceId) => {
     setActiveId(id);
@@ -1001,6 +1056,7 @@ export function LanternExperience() {
     setLanternName("");
     setRingSerial(PLACEHOLDER_SERIAL);
     setCorrelated(false);
+    setContactScanned(false);
     setPhase("boot");
   };
 
@@ -1035,8 +1091,10 @@ export function LanternExperience() {
           lanternName={lanternName}
           ringSerial={ringSerial}
           correlated={correlated}
+          contactScanned={contactScanned}
           onSetName={setLanternName}
           onCorrelate={() => setCorrelated(true)}
+          onScanContact={() => setContactScanned(true)}
           onReset={resetPrototype}
         />
       )}
