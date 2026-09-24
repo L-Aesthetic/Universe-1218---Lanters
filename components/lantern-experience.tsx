@@ -662,7 +662,13 @@ function LanternScreen({
                   <div><dt>PRIOR CONTACT</dt><dd>Guardian seal remains partially enforced.</dd></div>
                   <div>
                     <dt>NEXT ACTION</dt>
-                    <dd>{correlated ? "Trace the matching signal beyond Earth." : "Compare historic waveform against current scene trace."}</dd>
+                    <dd>
+                      {contactScanned
+                        ? "Resolve the three-origin spatial echo."
+                        : correlated
+                          ? "Trace the matching signal beyond Earth."
+                          : "Compare historic waveform against current scene trace."}
+                    </dd>
                   </div>
                 </dl>
               </div>
@@ -838,7 +844,11 @@ function LanternScreen({
                     <small>SELECTED CONTACT</small>
                     <b>{activeSector.name}</b>
                     <p>{activeSector.detail}</p>
-                    <span>{activeSector.status}</span>
+                    <span>
+                      {activeSector.id === "dark" && contactScanned
+                        ? "ECHO DETECTED"
+                        : activeSector.status}
+                    </span>
                     {activeSector.id === "dark" ? (
                       <>
                         <em>
