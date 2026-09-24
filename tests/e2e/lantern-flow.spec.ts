@@ -37,7 +37,7 @@ test("case intelligence advances instead of leaving stale objectives", async ({
 }) => {
   await reachSelection(page);
   await page.getByRole("button", { name: /put on the ring/i }).click();
-  await page.getByRole("button", { name: /^case$/i }).click();
+  await page.getByRole("button", { name: /case/i }).click();
 
   await expect(
     page.getByRole("heading", { name: /why was the prior-contact record sealed/i }),
@@ -58,7 +58,7 @@ test("case intelligence advances instead of leaving stale objectives", async ({
 
   await expect(page.getByText(/echo detected/i).first()).toBeVisible();
 
-  await page.getByRole("button", { name: /^case$/i }).click();
+  await page.getByRole("button", { name: /case/i }).click();
   await expect(
     page.getByRole("heading", {
       name: /how can one signature arrive from three places/i,
