@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 type Phase = "boot" | "archive" | "case" | "selection" | "lantern";
 type EvidenceId = "scene" | "witness" | "record";
+type RingSystem = "record" | "case" | "archive" | "sector" | "construct";
+type ConstructKind = "shield" | "bridge" | "beacon";
 
 type Evidence = {
   id: EvidenceId;
@@ -42,6 +44,72 @@ function createRingSerial() {
   const random = new Uint32Array(1);
   window.crypto.getRandomValues(random);
   return `2814-${String(random[0] % 100000000).padStart(8, "0")}`;
+}
+
+const sectorNodes = [
+  { id: "sol", name: "SOL", detail: "LOCAL SYSTEM // EARTH", status: "ACTIVE" },
+  { id: "oa", name: "OA", detail: "CORPS CENTRAL // ROUTE CLASSIFIED", status: "LINKED" },
+  { id: "relay", name: "RELAY 2814-04", detail: "DEEP-SPACE ARCHIVE RELAY", status: "ONLINE" },
+  { id: "dark", name: "UNKNOWN CONTACT", detail: "BEARING 044.18 // DISTANCE UNRESOLVED", status: "UNRESOLVED" },
+] as const;
+
+const constructPrograms: Record<ConstructKind, { name: string; purpose: string; note: string }> = {
+  shield: {
+    name: "DEFENSIVE SHIELD",
+    purpose: "Disperse frontal impact across a continuous energy surface.",
+    note: "Stable. Low complexity. Suitable for first-form training.",
+  },
+  bridge: {
+    name: "LOAD-BEARING BRIDGE",
+    purpose: "Carry distributed weight across an unsupported span.",
+    note: "Structural members must resolve load before the surface is filled.",
+  },
+  beacon: {
+    name: "DISTRESS BEACON",
+    purpose: "Broadcast a Corps-recognizable emergency signature.",
+    note: "Non-combat construct. High persistence, low energy demand.",
+  },
+};
+
+function ringFeedback(kind: "soft" | "confirm" | "alert") {
+  if (typeof window === "undefined") return;
+
+  if ("vibrate" in navigator) {
+    navigator.vibrate(
+      kind === "alert" ? [18, 32, 26] : kind === "confirm" ? [12, 18, 22] : 8,
+    );
+  }
+
+  try {
+    const audio = new AudioContext();
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    const now = audio.currentTime;
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(
+      kind === "alert" ? 180 : kind === "confirm" ? 420 : 320,
+      now,
+    );
+    oscillator.frequency.exponentialRampToValueAtTime(
+      kind === "alert" ? 92 : kind === "confirm" ? 720 : 410,
+      now + 0.16,
+    );
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(kind === "confirm" ? 0.055 : 0.03, now + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+
+    oscillator.connect(gain);
+    gain.connect(audio.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.22);
+    oscillator.addEventListener("ended", () => {
+      void audio.close();
+    });
+  } catch {
+    // Sound is enhancement only; browser policy or device support may block it.
+  }
 }
 
 const evidence: Evidence[] = [
@@ -428,7 +496,21 @@ function LanternScreen({
   onReset: () => void;
 }) {
   const [draftName, setDraftName] = useState(lanternName);
+  const [system, setSystem] = useState<RingSystem>("record");
+  const [construct, setConstruct] = useState<ConstructKind>("shield");
+  const [constructPulse, setConstructPulse] = useState(0);
   const hasName = lanternName.trim().length > 0;
+
+  const openSystem = (next: RingSystem) => {
+    ringFeedback(next === "construct" ? "confirm" : "soft");
+    setSystem(next);
+  };
+
+  const runConstruct = (next: ConstructKind) => {
+    setConstruct(next);
+    setConstructPulse((value) => value + 1);
+    ringFeedback("confirm");
+  };
 
   return (
     <section className="screen screen--lantern">
@@ -444,131 +526,294 @@ function LanternScreen({
           <Classification value="PROBATIONARY" />
         </header>
 
-        <main className="lantern-main">
-          <section className="identity-panel">
-            <div className="identity-sigil" aria-hidden="true">
-              <span className="identity-sigil__ring" />
-              <LanternMark />
-            </div>
+        <main className="ring-system">
+          {system === "record" && (
+            <div className="lantern-main">
+              <section className="identity-panel">
+                <div className="identity-sigil" aria-hidden="true">
+                  <span className="identity-sigil__ring" />
+                  <LanternMark />
+                </div>
 
-            <div className="identity-copy">
-              <div className="eyebrow">CORPS SERVICE RECORD</div>
-              <h1>{hasName ? lanternName.toUpperCase() : "IDENTITY PENDING"}</h1>
-              <p className="lantern-number">LANTERN {ringSerial}</p>
+                <div className="identity-copy">
+                  <div className="eyebrow">CORPS SERVICE RECORD</div>
+                  <h1>{hasName ? lanternName.toUpperCase() : "IDENTITY PENDING"}</h1>
+                  <p className="lantern-number">LANTERN {ringSerial}</p>
 
-              {!hasName ? (
-                <form
-                  className="identity-form"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    const next = draftName.trim();
-                    if (next) onSetName(next);
-                  }}
-                >
-                  <label htmlFor="lantern-name">
-                    Corps identification
-                    <small>
-                      Your name stays in this browser in the current prototype.
-                    </small>
-                  </label>
+                  {!hasName ? (
+                    <form
+                      className="identity-form"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const next = draftName.trim();
+                        if (next) {
+                          onSetName(next);
+                          ringFeedback("confirm");
+                        }
+                      }}
+                    >
+                      <label htmlFor="lantern-name">
+                        Corps identification
+                        <small>
+                          Your name stays in this browser in the current prototype.
+                        </small>
+                      </label>
+                      <div>
+                        <input
+                          id="lantern-name"
+                          value={draftName}
+                          onChange={(event) => setDraftName(event.target.value)}
+                          autoComplete="name"
+                          maxLength={64}
+                          placeholder="Enter your name"
+                        />
+                        <button type="submit">CONFIRM</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="record-grid">
+                      <span><small>SPECIES</small><b>HUMAN</b></span>
+                      <span><small>HOMEWORLD</small><b>EARTH</b></span>
+                      <span><small>SECTOR</small><b>2814</b></span>
+                      <span><small>STATUS</small><b>PROBATIONARY</b></span>
+                      <span><small>ASSIGNMENTS</small><b>01</b></span>
+                      <span><small>OPEN CASES</small><b>01</b></span>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="assignment-panel">
+                <div className="assignment-panel__heading">
+                  <span>
+                    <small>CURRENT ASSIGNMENT</small>
+                    <b>2814-E/001</b>
+                  </span>
+                  <Classification value="REOPENED" />
+                </div>
+
+                <div className="assignment-panel__body">
                   <div>
-                    <input
-                      id="lantern-name"
-                      value={draftName}
-                      onChange={(event) => setDraftName(event.target.value)}
-                      autoComplete="name"
-                      maxLength={64}
-                      placeholder="Enter your name"
-                    />
-                    <button type="submit">CONFIRM</button>
+                    <span className="assignment-pulse" aria-hidden="true" />
+                    <p>
+                      Your archive activity has been attached to the active
+                      investigation.
+                    </p>
                   </div>
-                </form>
-              ) : (
-                <div className="record-grid">
-                  <span>
-                    <small>SPECIES</small>
-                    <b>HUMAN</b>
-                  </span>
-                  <span>
-                    <small>HOMEWORLD</small>
-                    <b>EARTH</b>
-                  </span>
-                  <span>
-                    <small>SECTOR</small>
-                    <b>2814</b>
-                  </span>
-                  <span>
-                    <small>STATUS</small>
-                    <b>PROBATIONARY</b>
-                  </span>
-                  <span>
-                    <small>ASSIGNMENTS</small>
-                    <b>01</b>
-                  </span>
-                  <span>
-                    <small>OPEN CASES</small>
-                    <b>01</b>
-                  </span>
+                  <dl>
+                    <div><dt>OBJECTIVE</dt><dd>Determine why the Oan record was restricted.</dd></div>
+                    <div><dt>AUTHORITY</dt><dd>Field access granted.</dd></div>
+                    <div><dt>RING STATUS</dt><dd>99.7% charge.</dd></div>
+                  </dl>
+                  <button className="system-link" type="button" onClick={() => openSystem("case")}>
+                    OPEN FIELD ASSIGNMENT <span>→</span>
+                  </button>
                 </div>
-              )}
+              </section>
             </div>
-          </section>
+          )}
 
-          <section className="assignment-panel">
-            <div className="assignment-panel__heading">
-              <span>
-                <small>CURRENT ASSIGNMENT</small>
-                <b>2814-E/001</b>
-              </span>
-              <Classification value="REOPENED" />
-            </div>
-
-            <div className="assignment-panel__body">
-              <div>
-                <span className="assignment-pulse" aria-hidden="true" />
-                <p>
-                  Your archive activity has been attached to the active
-                  investigation.
-                </p>
+          {system === "case" && (
+            <section className="system-panel">
+              <div className="system-panel__header">
+                <span>
+                  <div className="eyebrow">FIELD ASSIGNMENT</div>
+                  <h2>2814-E/001</h2>
+                </span>
+                <Classification value="REOPENED" />
               </div>
-              <dl>
-                <div>
-                  <dt>OBJECTIVE</dt>
-                  <dd>Determine why the Oan record was restricted.</dd>
+              <div className="field-case-grid">
+                <article>
+                  <small>PRIMARY QUESTION</small>
+                  <h3>Why was the prior-contact record sealed?</h3>
+                  <p>
+                    Your access changed the moment the archive identified you.
+                    The anomaly is still unclassified, but the earlier record is no
+                    longer completely dark.
+                  </p>
+                </article>
+                <dl>
+                  <div><dt>JORDAN, H.</dt><dd>Active field assignment. Position withheld.</dd></div>
+                  <div><dt>STEWART, J.</dt><dd>Active field assignment. Earth-local.</dd></div>
+                  <div><dt>PRIOR CONTACT</dt><dd>Guardian seal remains partially enforced.</dd></div>
+                  <div><dt>NEXT ACTION</dt><dd>Compare historic waveform against current scene trace.</dd></div>
+                </dl>
+              </div>
+              <button className="system-link" type="button" onClick={() => openSystem("archive")}>
+                ACCESS PRIOR-CONTACT ARCHIVE <span>→</span>
+              </button>
+            </section>
+          )}
+
+          {system === "archive" && (
+            <section className="system-panel">
+              <div className="system-panel__header">
+                <span>
+                  <div className="eyebrow">RING ARCHIVE</div>
+                  <h2>Partial clearance.</h2>
+                </span>
+                <Classification value="LANTERN ACCESS" />
+              </div>
+              <div className="archive-records">
+                {evidence.map((item) => (
+                  <button
+                    type="button"
+                    key={item.id}
+                    onClick={() => ringFeedback("soft")}
+                    className="archive-record"
+                  >
+                    <span>{item.index}</span>
+                    <div>
+                      <small>{item.label}</small>
+                      <b>{item.title}</b>
+                      <p>{item.summary}</p>
+                    </div>
+                    <i>{item.status === "restricted" ? "PARTIAL" : "VERIFIED"}</i>
+                  </button>
+                ))}
+                <div className="archive-record archive-record--new">
+                  <span>04</span>
+                  <div>
+                    <small>PRIOR CONTACT // NEW CLEARANCE</small>
+                    <b>Record 2814-Δ/19</b>
+                    <p>
+                      The same waveform was logged before either current Earth
+                      Lantern entered Corps service.
+                    </p>
+                  </div>
+                  <i>UNSEALED 12%</i>
                 </div>
-                <div>
-                  <dt>AUTHORITY</dt>
-                  <dd>Field access granted.</dd>
+              </div>
+            </section>
+          )}
+
+          {system === "sector" && (
+            <section className="system-panel system-panel--sector">
+              <div className="system-panel__header">
+                <span>
+                  <div className="eyebrow">SECTOR NAVIGATION</div>
+                  <h2>2814 is larger than Earth.</h2>
+                </span>
+                <Classification value="LIVE MAP" />
+              </div>
+              <div className="sector-field">
+                <div className="sector-radar" aria-hidden="true">
+                  <span className="sector-ring sector-ring--a" />
+                  <span className="sector-ring sector-ring--b" />
+                  <span className="sector-ring sector-ring--c" />
+                  <span className="sector-axis sector-axis--x" />
+                  <span className="sector-axis sector-axis--y" />
+                  <i className="sector-point sector-point--earth" />
+                  <i className="sector-point sector-point--relay" />
+                  <i className="sector-point sector-point--unknown" />
                 </div>
-                <div>
-                  <dt>RING STATUS</dt>
-                  <dd>99.7% charge.</dd>
+                <div className="sector-node-list">
+                  {sectorNodes.map((node) => (
+                    <button type="button" key={node.id} onClick={() => ringFeedback(node.id === "dark" ? "alert" : "soft")}>
+                      <span>
+                        <b>{node.name}</b>
+                        <small>{node.detail}</small>
+                      </span>
+                      <i>{node.status}</i>
+                    </button>
+                  ))}
                 </div>
-              </dl>
-            </div>
-          </section>
+              </div>
+            </section>
+          )}
+
+          {system === "construct" && (
+            <section className="system-panel system-panel--construct">
+              <div className="system-panel__header">
+                <span>
+                  <div className="eyebrow">CONSTRUCT TRAINING // BASIC FORM</div>
+                  <h2>Intent is not structure.</h2>
+                </span>
+                <Classification value="TRAINING" />
+              </div>
+
+              <div className="construct-layout">
+                <div className="construct-stage" key={constructPulse + construct}>
+                  <div className={`construct construct--${construct}`} aria-hidden="true">
+                    <span className="construct-part construct-part--one" />
+                    <span className="construct-part construct-part--two" />
+                    <span className="construct-part construct-part--three" />
+                    <span className="construct-part construct-part--four" />
+                  </div>
+                  <div className="construct-readout">
+                    <span><small>PROGRAM</small><b>{constructPrograms[construct].name}</b></span>
+                    <span><small>STABILITY</small><b>{construct === "bridge" ? "84.2%" : "98.6%"}</b></span>
+                    <span><small>DRAW</small><b>{construct === "beacon" ? "LOW" : "NOMINAL"}</b></span>
+                  </div>
+                </div>
+
+                <div className="construct-controls">
+                  <div>
+                    <small>PURPOSE</small>
+                    <p>{constructPrograms[construct].purpose}</p>
+                  </div>
+                  <div>
+                    <small>RING ASSESSMENT</small>
+                    <p>{constructPrograms[construct].note}</p>
+                  </div>
+                  <div className="construct-programs">
+                    {(Object.keys(constructPrograms) as ConstructKind[]).map((kind) => (
+                      <button
+                        type="button"
+                        key={kind}
+                        className={kind === construct ? "active" : ""}
+                        onClick={() => runConstruct(kind)}
+                      >
+                        {constructPrograms[kind].name}
+                      </button>
+                    ))}
+                  </div>
+                  <button className="system-link" type="button" onClick={() => runConstruct(construct)}>
+                    REBUILD CONSTRUCT <span>↻</span>
+                  </button>
+                </div>
+              </div>
+            </section>
+          )}
         </main>
 
         <nav className="ring-dock" aria-label="Lantern systems">
-          <span className="ring-dock__item ring-dock__item--active">
-            <i>01</i>
-            <b>CASE</b>
-          </span>
-          <span className="ring-dock__item">
-            <i>02</i>
-            <b>ARCHIVE</b>
-          </span>
-          <span className="ring-dock__core" aria-hidden="true">
+          <button
+            type="button"
+            className={`ring-dock__item ${system === "case" ? "ring-dock__item--active" : ""}`}
+            onClick={() => openSystem("case")}
+          >
+            <i>01</i><b>CASE</b>
+          </button>
+          <button
+            type="button"
+            className={`ring-dock__item ${system === "archive" ? "ring-dock__item--active" : ""}`}
+            onClick={() => openSystem("archive")}
+          >
+            <i>02</i><b>ARCHIVE</b>
+          </button>
+          <button
+            type="button"
+            className={`ring-dock__core ${system === "record" ? "ring-dock__core--active" : ""}`}
+            onClick={() => openSystem("record")}
+            aria-label="Open Lantern service record"
+          >
             <LanternMark compact />
-          </span>
-          <span className="ring-dock__item ring-dock__item--locked">
-            <i>03</i>
-            <b>SECTOR</b>
-          </span>
-          <span className="ring-dock__item ring-dock__item--locked">
-            <i>04</i>
-            <b>CONSTRUCT</b>
-          </span>
+          </button>
+          <button
+            type="button"
+            className={`ring-dock__item ${system === "sector" ? "ring-dock__item--active" : ""}`}
+            onClick={() => openSystem("sector")}
+          >
+            <i>03</i><b>SECTOR</b>
+          </button>
+          <button
+            type="button"
+            className={`ring-dock__item ${system === "construct" ? "ring-dock__item--active" : ""}`}
+            onClick={() => openSystem("construct")}
+          >
+            <i>04</i><b>CONSTRUCT</b>
+          </button>
         </nav>
 
         <button className="prototype-reset" type="button" onClick={onReset}>
@@ -632,6 +877,7 @@ export function LanternExperience() {
   };
 
   const acceptRing = () => {
+    ringFeedback("confirm");
     if (ringSerial === PLACEHOLDER_SERIAL) {
       setRingSerial(createRingSerial());
     }
