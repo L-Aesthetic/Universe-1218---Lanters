@@ -18,6 +18,7 @@ export type PersistedState = {
   lanternName?: string;
   ringSerial?: string;
   correlated?: boolean;
+  contactScanned?: boolean;
 };
 
 export type RingSystem =
