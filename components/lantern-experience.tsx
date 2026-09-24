@@ -377,9 +377,11 @@ function CaseScreen({
 
 function SelectionScreen({
   reviewed,
+  soundEnabled,
   onAccept,
 }: {
   reviewed: EvidenceId[];
+  soundEnabled: boolean;
   onAccept: () => void;
 }) {
   const [accepting, setAccepting] = useState(false);
@@ -388,7 +390,7 @@ function SelectionScreen({
   const accept = () => {
     if (accepting) return;
     setAccepting(true);
-    ringFeedback("confirm");
+    ringFeedback("confirm", { sound: soundEnabled });
     window.setTimeout(onAccept, 900);
   };
 
@@ -504,6 +506,7 @@ function LanternScreen({
     "idle" | "copied" | "shared" | "failed"
   >("idle");
   const [announcement, setAnnouncement] = useState("");
+  const [resetArmed, setResetArmed] = useState(false);
   const hasName = lanternName.trim().length > 0;
   const selectedLabel = selectedAt
     ? new Intl.DateTimeFormat("en-US", {
@@ -581,6 +584,19 @@ function LanternScreen({
     feedback("confirm");
   };
 
+  const requestReset = () => {
+    if (resetArmed) {
+      onReset();
+      return;
+    }
+
+    setResetArmed(true);
+    setAnnouncement(
+      "Reset armed. Activate reset again to erase this local Lantern record.",
+    );
+    window.setTimeout(() => setResetArmed(false), 5000);
+  };
+
   const shareRingRecord = async () => {
     const displayName = hasName ? lanternName.toUpperCase() : "UNREGISTERED LANTERN";
     const text = `${displayName} // LANTERN ${ringSerial} // SECTOR 2814 // U1218`;
@@ -594,17 +610,14 @@ function LanternScreen({
       if (navigator.share) {
         await navigator.share(shareData);
         setShareState("shared");
+        setAnnouncement("Ring record transmitted.");
       } else {
         await navigator.clipboard.writeText(
           `${shareData.text}\n${shareData.url}`,
         );
         setShareState("copied");
+        setAnnouncement("Ring record copied.");
       }
-      setAnnouncement(
-        shareState === "shared"
-          ? "Ring record transmitted."
-          : "Ring record copied.",
-      );
       feedback("soft");
       window.setTimeout(() => setShareState("idle"), 2600);
     } catch (error) {
@@ -773,9 +786,17 @@ function LanternScreen({
                   </div>
                   <dl>
                     <div><dt>OBJECTIVE</dt><dd>{caseIntel.objective}</dd></div>
-                    <div><dt>AUTHORITY</dt><dd>Field access granted.</dd></div>
+                    <div><dt>CASE STAGE</dt><dd>{caseIntel.stage.toUpperCase()}</dd></div>
                     <div><dt>RING STATUS</dt><dd>99.7% charge.</dd></div>
                   </dl>
+                  <div className="finding-strip" aria-label="current case findings">
+                    {caseIntel.findings.slice(-3).map((finding) => (
+                      <span key={finding.id}>
+                        <small>{finding.confidence}</small>
+                        <b>{finding.label}</b>
+                      </span>
+                    ))}
+                  </div>
                   <button className="system-link" type="button" onClick={() => openSystem("case")}>
                     OPEN FIELD ASSIGNMENT <span>→</span>
                   </button>
@@ -1051,8 +1072,8 @@ function LanternScreen({
                       </>
                     ) : activeSector.id === "oa" ? (
                       <em>
-                        Direct route data is withheld from probationary Lantern
-                        clearance. Corps relay remains available.
+                        Direct route data is withheld at the current ring clearance.
+                        Corps relay remains available.
                       </em>
                     ) : activeSector.id === "relay" ? (
                       <em>
@@ -1184,8 +1205,12 @@ function LanternScreen({
           </button>
         </nav>
 
-        <button className="prototype-reset" type="button" onClick={onReset}>
-          RESET PROTOTYPE
+        <button
+          className={`prototype-reset ${resetArmed ? "prototype-reset--armed" : ""}`}
+          type="button"
+          onClick={requestReset}
+        >
+          {resetArmed ? "CONFIRM LOCAL RESET" : "RESET LOCAL RECORD"}
         </button>
       </div>
     </section>
@@ -1351,13 +1376,17 @@ export function LanternExperience() {
           activeId={activeId}
           onOpenEvidence={openEvidence}
           onInterrupt={() => {
-            ringFeedback("alert");
+            ringFeedback("alert", { sound: soundEnabled });
             setPhase("selection");
           }}
         />
       )}
       {phase === "selection" && (
-        <SelectionScreen reviewed={reviewed} onAccept={acceptRing} />
+        <SelectionScreen
+          reviewed={reviewed}
+          soundEnabled={soundEnabled}
+          onAccept={acceptRing}
+        />
       )}
       {phase === "lantern" && (
         <LanternScreen
