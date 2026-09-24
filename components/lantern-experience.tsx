@@ -447,8 +447,17 @@ function CaseScreen({
 }
 
 function SelectionScreen({ onAccept }: { onAccept: () => void }) {
+  const [accepting, setAccepting] = useState(false);
+
+  const accept = () => {
+    if (accepting) return;
+    setAccepting(true);
+    ringFeedback("confirm");
+    window.setTimeout(onAccept, 900);
+  };
+
   return (
-    <section className="screen screen--selection">
+    <section className={`screen screen--selection ${accepting ? "screen--accepting" : ""}`}>
       <div className="selection-noise" aria-hidden="true" />
       <div className="selection-copy selection-copy--top">
         ARCHIVE CONNECTION TERMINATED
@@ -468,6 +477,22 @@ function SelectionScreen({ onAccept }: { onAccept: () => void }) {
 
       <div className="selection-dialogue">
         <div className="selection-system">UNREGISTERED SENTIENT DETECTED</div>
+
+        <div className="selection-receipts" aria-label="observer activity">
+          <span>
+            <small>OFFICIAL SEQUENCE ACCEPTED</small>
+            <b>NO</b>
+          </span>
+          <span>
+            <small>TIMELINE CONFLICT PURSUED</small>
+            <b>YES</b>
+          </span>
+          <span>
+            <small>RESTRICTED RECORD EXAMINED</small>
+            <b>YES</b>
+          </span>
+        </div>
+
         <div className="selection-origin">
           <span>
             ORIGIN <b>EARTH</b>
@@ -478,8 +503,14 @@ function SelectionScreen({ onAccept }: { onAccept: () => void }) {
         </div>
         <h2>Human of Earth.</h2>
         <p>You have the ability to overcome great fear.</p>
-        <button className="accept-ring" type="button" onClick={onAccept}>
-          <span>PUT ON THE RING</span>
+        <div className="selection-verdict">SELECTION CRITERIA SATISFIED</div>
+        <button
+          className="accept-ring"
+          type="button"
+          disabled={accepting}
+          onClick={accept}
+        >
+          <span>{accepting ? "RING LINK ESTABLISHING" : "PUT ON THE RING"}</span>
         </button>
       </div>
     </section>
@@ -972,7 +1003,6 @@ export function LanternExperience() {
   };
 
   const acceptRing = () => {
-    ringFeedback("confirm");
     if (ringSerial === PLACEHOLDER_SERIAL) {
       setRingSerial(createRingSerial());
     }
@@ -1005,7 +1035,10 @@ export function LanternExperience() {
           reviewed={reviewed}
           activeId={activeId}
           onOpenEvidence={openEvidence}
-          onInterrupt={() => setPhase("selection")}
+          onInterrupt={() => {
+            ringFeedback("alert");
+            setPhase("selection");
+          }}
         />
       )}
       {phase === "selection" && <SelectionScreen onAccept={acceptRing} />}
