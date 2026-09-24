@@ -458,7 +458,21 @@ function SelectionScreen({ onAccept }: { onAccept: () => void }) {
   };
 
   return (
-    <section className={`screen screen--selection ${accepting ? "screen--accepting" : ""}`}>
+    <section
+      className={`screen screen--selection ${accepting ? "screen--accepting" : ""}`}
+      onPointerMove={(event) => {
+        if (accepting) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width - 0.5) * 22;
+        const y = ((event.clientY - rect.top) / rect.height - 0.5) * 14;
+        event.currentTarget.style.setProperty("--ring-x", `${x.toFixed(2)}px`);
+        event.currentTarget.style.setProperty("--ring-y", `${y.toFixed(2)}px`);
+      }}
+      onPointerLeave={(event) => {
+        event.currentTarget.style.setProperty("--ring-x", "0px");
+        event.currentTarget.style.setProperty("--ring-y", "0px");
+      }}
+    >
       <div className="selection-noise" aria-hidden="true" />
       <div className="selection-copy selection-copy--top">
         ARCHIVE CONNECTION TERMINATED
