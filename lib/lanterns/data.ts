@@ -4,6 +4,7 @@ import type {
   EvidenceId,
   Phase,
 } from "./types";
+import { ORIGINS } from "./canon";
 
 export const STORAGE_KEY = "u1218-lantern-state-v1";
 export const PLACEHOLDER_SERIAL = "2814-00000000";
@@ -44,6 +45,7 @@ export const evidence: Evidence[] = [
       "The trace ends without a corresponding departure vector.",
     ],
     status: "verified",
+    origin: ORIGINS.u1218Original,
   },
   {
     id: "witness",
@@ -60,6 +62,7 @@ export const evidence: Evidence[] = [
       "The sequence conflicts with the official incident timeline.",
     ],
     status: "conflict",
+    origin: ORIGINS.u1218Original,
   },
   {
     id: "record",
@@ -76,6 +79,7 @@ export const evidence: Evidence[] = [
       "Reason for restriction: Guardian authorization required.",
     ],
     status: "restricted",
+    origin: ORIGINS.u1218Adaptation,
   },
 ];
 
@@ -85,44 +89,60 @@ export const sectorNodes = [
     name: "SOL",
     detail: "LOCAL SYSTEM // EARTH",
     status: "ACTIVE",
+    origin: ORIGINS.u1218Adaptation,
   },
   {
     id: "oa",
     name: "OA",
     detail: "CORPS CENTRAL // ROUTE CLASSIFIED",
     status: "LINKED",
+    origin: ORIGINS.dcCorps,
   },
   {
     id: "relay",
     name: "RELAY 2814-04",
     detail: "DEEP-SPACE ARCHIVE RELAY",
     status: "ONLINE",
+    origin: ORIGINS.u1218Original,
   },
   {
     id: "dark",
     name: "UNKNOWN CONTACT",
     detail: "BEARING 044.18 // DISTANCE UNRESOLVED",
     status: "UNRESOLVED",
+    origin: ORIGINS.u1218Original,
   },
 ] as const;
 
 export const constructPrograms: Record<
   ConstructKind,
-  { name: string; purpose: string; note: string }
+  {
+    name: string;
+    purpose: string;
+    note: string;
+    origin: typeof ORIGINS.u1218Original | typeof ORIGINS.u1218Adaptation;
+    buildOrder: string[];
+  }
 > = {
   shield: {
     name: "DEFENSIVE SHIELD",
     purpose: "Disperse frontal impact across a continuous energy surface.",
     note: "Stable. Low complexity. Suitable for first-form training.",
+    origin: ORIGINS.u1218Adaptation,
+    buildOrder: ["FIELD AXIS", "RIM", "INNER BRACING", "ENERGY SURFACE"],
   },
   bridge: {
     name: "LOAD-BEARING BRIDGE",
     purpose: "Carry distributed weight across an unsupported span.",
     note: "Structural members must resolve load before the surface is filled.",
+    origin: ORIGINS.u1218Adaptation,
+    buildOrder: ["LOAD PATH", "SUPPORTS", "JOINTS", "WALKING SURFACE"],
   },
   beacon: {
     name: "DISTRESS BEACON",
     purpose: "Broadcast a Corps-recognizable emergency signature.",
     note: "Non-combat construct. High persistence, low energy demand.",
+    origin: ORIGINS.u1218Original,
+    buildOrder: ["CORE", "CARRIER", "REPEATER FIELD", "BROADCAST"],
   },
 };
