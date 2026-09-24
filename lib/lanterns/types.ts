@@ -1,3 +1,5 @@
+import type { RecordOrigin } from "./canon";
+
 export type Phase = "boot" | "archive" | "case" | "selection" | "lantern";
 
 export type EvidenceId = "scene" | "witness" | "record";
@@ -10,6 +12,7 @@ export type Evidence = {
   summary: string;
   detail: string[];
   status: "verified" | "conflict" | "restricted";
+  origin: RecordOrigin;
 };
 
 export type PersistedState = {
@@ -21,6 +24,8 @@ export type PersistedState = {
   contactScanned?: boolean;
   selectedAt?: string;
   constructsBuilt?: ConstructKind[];
+  activeEvidenceId?: EvidenceId;
+  soundEnabled?: boolean;
 };
 
 export type RingSystem =

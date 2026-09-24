@@ -1,10 +1,25 @@
 import type { Metadata, Viewport } from "next";
+import { Barlow, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
+const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Sector 2814 // Oan Central Archive",
+  title: "Universe-1218 // Sector 2814 Archive",
   description:
-    "An unofficial Green Lantern fan experience set inside the Oan Central Archive.",
+    "An unofficial, non-commercial Green Lantern fan experience set in the Universe-1218 continuity.",
 };
 
 export const viewport: Viewport = {
@@ -19,7 +34,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${barlow.variable} ${plexMono.variable}`}>
+        {children}
+      </body>
     </html>
   );
 }
