@@ -438,6 +438,7 @@ function LanternScreen({
   const [constructPulse, setConstructPulse] = useState(0);
   const [archiveRecord, setArchiveRecord] = useState<ArchiveRecordId>("prior");
   const [sectorNode, setSectorNode] = useState<SectorNodeId>("sol");
+  const [shareState, setShareState] = useState<"idle" | "copied" | "shared">("idle");
   const hasName = lanternName.trim().length > 0;
 
   const activeArchive =
@@ -499,6 +500,32 @@ function LanternScreen({
     ringFeedback("confirm");
   };
 
+  const shareRingRecord = async () => {
+    const displayName = hasName ? lanternName.toUpperCase() : "UNREGISTERED LANTERN";
+    const text = `${displayName} // LANTERN ${ringSerial} // SECTOR 2814 // PROBATIONARY`;
+    const shareData = {
+      title: "Green Lantern Corps service record",
+      text: `${text}\nThe ring chose me. See if it chooses you.`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        setShareState("shared");
+      } else {
+        await navigator.clipboard.writeText(
+          `${shareData.text}\n${shareData.url}`,
+        );
+        setShareState("copied");
+      }
+      ringFeedback("soft");
+      window.setTimeout(() => setShareState("idle"), 2600);
+    } catch {
+      // Closing the native share sheet is not an application error.
+    }
+  };
+
   return (
     <section className="screen screen--lantern">
       <div className="lantern-shell">
@@ -525,7 +552,16 @@ function LanternScreen({
                 <div className="identity-copy">
                   <div className="eyebrow">CORPS SERVICE RECORD</div>
                   <h1>{hasName ? lanternName.toUpperCase() : "IDENTITY PENDING"}</h1>
-                  <p className="lantern-number">LANTERN {ringSerial}</p>
+                  <div className="lantern-id-line">
+                    <p className="lantern-number">LANTERN {ringSerial}</p>
+                    <button type="button" onClick={shareRingRecord}>
+                      {shareState === "copied"
+                        ? "RECORD COPIED"
+                        : shareState === "shared"
+                          ? "TRANSMISSION SENT"
+                          : "SHARE RING RECORD"}
+                    </button>
+                  </div>
 
                   {!hasName ? (
                     <form
