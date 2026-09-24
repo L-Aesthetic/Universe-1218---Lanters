@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-async function reachSelection(page: Parameters<typeof test>[0]["page"]) {
+async function reachSelection(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: /establish archive link/i }).click();
   await page.getByRole("button", { name: /open incident/i }).click();
