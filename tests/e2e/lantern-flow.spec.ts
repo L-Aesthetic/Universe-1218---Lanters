@@ -9,7 +9,9 @@ async function reachSelection(page: Page) {
   await page.getByRole("button", { name: /energy trace/i }).click();
   await page.getByRole("button", { name: /the light came first/i }).click();
   await page.getByRole("button", { name: /prior contact/i }).click();
-  await page.getByRole("button", { name: /continue/i }).click();
+  await page
+    .getByRole("button", { name: /continue to observer scan/i })
+    .click();
 }
 
 test("selection becomes a persistent Lantern record", async ({ page }) => {
