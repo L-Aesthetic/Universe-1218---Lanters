@@ -418,6 +418,7 @@ function LanternScreen({
   ringSerial,
   correlated,
   contactScanned,
+  selectedAt,
   onSetName,
   onCorrelate,
   onScanContact,
@@ -427,6 +428,7 @@ function LanternScreen({
   ringSerial: string;
   correlated: boolean;
   contactScanned: boolean;
+  selectedAt: string;
   onSetName: (name: string) => void;
   onCorrelate: () => void;
   onScanContact: () => void;
@@ -440,6 +442,15 @@ function LanternScreen({
   const [sectorNode, setSectorNode] = useState<SectorNodeId>("sol");
   const [shareState, setShareState] = useState<"idle" | "copied" | "shared">("idle");
   const hasName = lanternName.trim().length > 0;
+  const selectedLabel = selectedAt
+    ? new Intl.DateTimeFormat("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+        .format(new Date(selectedAt))
+        .toUpperCase()
+    : "DATE PENDING";
 
   const activeArchive =
     archiveRecord === "prior"
@@ -553,7 +564,10 @@ function LanternScreen({
                   <div className="eyebrow">CORPS SERVICE RECORD</div>
                   <h1>{hasName ? lanternName.toUpperCase() : "IDENTITY PENDING"}</h1>
                   <div className="lantern-id-line">
-                    <p className="lantern-number">LANTERN {ringSerial}</p>
+                    <span>
+                      <p className="lantern-number">LANTERN {ringSerial}</p>
+                      <small>SELECTED // {selectedLabel}</small>
+                    </span>
                     <button type="button" onClick={shareRingRecord}>
                       {shareState === "copied"
                         ? "RECORD COPIED"
@@ -1044,6 +1058,7 @@ export function LanternExperience() {
   const [ringSerial, setRingSerial] = useState(PLACEHOLDER_SERIAL);
   const [correlated, setCorrelated] = useState(false);
   const [contactScanned, setContactScanned] = useState(false);
+  const [selectedAt, setSelectedAt] = useState("");
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -1070,6 +1085,12 @@ export function LanternExperience() {
         if (typeof parsed.contactScanned === "boolean") {
           setContactScanned(parsed.contactScanned);
         }
+        if (
+          typeof parsed.selectedAt === "string" &&
+          !Number.isNaN(Date.parse(parsed.selectedAt))
+        ) {
+          setSelectedAt(parsed.selectedAt);
+        }
       }
     } catch {
       // A corrupt local prototype state should never block entry.
@@ -1087,6 +1108,7 @@ export function LanternExperience() {
       ringSerial,
       correlated,
       contactScanned,
+      selectedAt,
     };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [
@@ -1097,6 +1119,7 @@ export function LanternExperience() {
     phase,
     reviewed,
     ringSerial,
+    selectedAt,
   ]);
 
   const openEvidence = (id: EvidenceId) => {
@@ -1110,6 +1133,9 @@ export function LanternExperience() {
     if (ringSerial === PLACEHOLDER_SERIAL) {
       setRingSerial(createRingSerial());
     }
+    if (!selectedAt) {
+      setSelectedAt(new Date().toISOString());
+    }
     setPhase("lantern");
   };
 
@@ -1121,6 +1147,7 @@ export function LanternExperience() {
     setRingSerial(PLACEHOLDER_SERIAL);
     setCorrelated(false);
     setContactScanned(false);
+    setSelectedAt("");
     setPhase("boot");
   };
 
@@ -1156,6 +1183,7 @@ export function LanternExperience() {
           ringSerial={ringSerial}
           correlated={correlated}
           contactScanned={contactScanned}
+          selectedAt={selectedAt}
           onSetName={setLanternName}
           onCorrelate={() => setCorrelated(true)}
           onScanContact={() => setContactScanned(true)}
