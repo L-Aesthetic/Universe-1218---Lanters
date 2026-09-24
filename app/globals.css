@@ -2196,6 +2196,44 @@ button.archive-record:hover,
   padding-top: 16px;
 }
 
+.sector-scan-action {
+  margin-top: 16px;
+}
+
+.sector-scan-result {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 18px;
+  padding-top: 14px;
+}
+
+.sector-scan-result span {
+  background: rgba(98, 255, 159, 0.025);
+  border: 1px solid var(--line);
+  min-height: 56px;
+  padding: 9px;
+}
+
+.sector-scan-result small,
+.sector-scan-result b {
+  display: block;
+  font-family: var(--mono);
+}
+
+.sector-scan-result small {
+  color: var(--muted);
+  font-size: 0.42rem;
+  letter-spacing: 0.07em;
+}
+
+.sector-scan-result b {
+  color: var(--green-soft);
+  font-size: 0.52rem;
+  margin-top: 6px;
+}
+
 .construct-layout {
   display: grid;
   gap: 46px;
@@ -2757,6 +2795,10 @@ button.archive-record:hover,
 
   .sector-field {
     gap: 26px;
+  }
+
+  .sector-scan-result {
+    grid-template-columns: 1fr;
   }
 
   .sector-radar {
