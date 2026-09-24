@@ -470,6 +470,24 @@ function LanternScreen({
   const activeSector =
     sectorNodes.find((node) => node.id === sectorNode) ?? sectorNodes[0];
 
+  const missionStatus = contactScanned
+    ? "ESCALATED"
+    : correlated
+      ? "CORRELATION FOUND"
+      : "REOPENED";
+
+  const missionObjective = contactScanned
+    ? "Determine why one signature is arriving from three incompatible origins."
+    : correlated
+      ? "Trace the matching off-world signal through Sector 2814."
+      : "Determine why the prior-contact record was sealed.";
+
+  const missionQuestion = contactScanned
+    ? "How can one signal come from three places?"
+    : correlated
+      ? "Where did the matching signal originate?"
+      : "Why was the prior-contact record sealed?";
+
   const openSystem = (next: RingSystem) => {
     ringFeedback(next === "construct" ? "confirm" : "soft");
     setSystem(next);
@@ -595,7 +613,7 @@ function LanternScreen({
                     <small>CURRENT ASSIGNMENT</small>
                     <b>2814-E/001</b>
                   </span>
-                  <Classification value="REOPENED" />
+                  <Classification value={missionStatus} />
                 </div>
 
                 <div className="assignment-panel__body">
@@ -607,7 +625,7 @@ function LanternScreen({
                     </p>
                   </div>
                   <dl>
-                    <div><dt>OBJECTIVE</dt><dd>Determine why the Oan record was restricted.</dd></div>
+                    <div><dt>OBJECTIVE</dt><dd>{missionObjective}</dd></div>
                     <div><dt>AUTHORITY</dt><dd>Field access granted.</dd></div>
                     <div><dt>RING STATUS</dt><dd>99.7% charge.</dd></div>
                   </dl>
@@ -626,12 +644,12 @@ function LanternScreen({
                   <div className="eyebrow">FIELD ASSIGNMENT</div>
                   <h2>2814-E/001</h2>
                 </span>
-                <Classification value={correlated ? "CORRELATION FOUND" : "REOPENED"} />
+                <Classification value={missionStatus} />
               </div>
               <div className="field-case-grid">
                 <article>
                   <small>PRIMARY QUESTION</small>
-                  <h3>Why was the prior-contact record sealed?</h3>
+                  <h3>{missionQuestion}</h3>
                   <p>
                     Your access changed the moment the archive identified you.
                     The anomaly is still unclassified, but the earlier record is no
@@ -812,7 +830,7 @@ function LanternScreen({
                           <b>{node.name}</b>
                           <small>{node.detail}</small>
                         </span>
-                        <i>{node.status}</i>
+                        <i>{node.id === "dark" && contactScanned ? "ECHO DETECTED" : node.status}</i>
                       </button>
                     ))}
                   </div>
