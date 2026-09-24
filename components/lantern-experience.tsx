@@ -24,6 +24,7 @@ type PersistedState = {
   reviewed: EvidenceId[];
   lanternName?: string;
   ringSerial?: string;
+  correlated?: boolean;
 };
 
 const STORAGE_KEY = "u1218-lantern-state-v1";
@@ -520,12 +521,16 @@ function SelectionScreen({ onAccept }: { onAccept: () => void }) {
 function LanternScreen({
   lanternName,
   ringSerial,
+  correlated,
   onSetName,
+  onCorrelate,
   onReset,
 }: {
   lanternName: string;
   ringSerial: string;
+  correlated: boolean;
   onSetName: (name: string) => void;
+  onCorrelate: () => void;
   onReset: () => void;
 }) {
   const [draftName, setDraftName] = useState(lanternName);
@@ -685,7 +690,7 @@ function LanternScreen({
                   <div className="eyebrow">FIELD ASSIGNMENT</div>
                   <h2>2814-E/001</h2>
                 </span>
-                <Classification value="REOPENED" />
+                <Classification value={correlated ? "CORRELATION FOUND" : "REOPENED"} />
               </div>
               <div className="field-case-grid">
                 <article>
@@ -701,12 +706,71 @@ function LanternScreen({
                   <div><dt>JORDAN, H.</dt><dd>Active field assignment. Position withheld.</dd></div>
                   <div><dt>STEWART, J.</dt><dd>Active field assignment. Earth-local.</dd></div>
                   <div><dt>PRIOR CONTACT</dt><dd>Guardian seal remains partially enforced.</dd></div>
-                  <div><dt>NEXT ACTION</dt><dd>Compare historic waveform against current scene trace.</dd></div>
+                  <div>
+                    <dt>NEXT ACTION</dt>
+                    <dd>{correlated ? "Trace the matching signal beyond Earth." : "Compare historic waveform against current scene trace."}</dd>
+                  </div>
                 </dl>
               </div>
-              <button className="system-link" type="button" onClick={() => openSystem("archive")}>
-                ACCESS PRIOR-CONTACT ARCHIVE <span>→</span>
-              </button>
+
+              <div className={`waveform-console ${correlated ? "waveform-console--matched" : ""}`}>
+                <div className="waveform-console__header">
+                  <span>
+                    <small>CURRENT TRACE</small>
+                    <b>2814-E/001 // 02:13:41.811</b>
+                  </span>
+                  <span>
+                    <small>HISTORIC TRACE</small>
+                    <b>2814-Δ/19 // DATE SEALED</b>
+                  </span>
+                </div>
+                <div className="waveform-plot" aria-label="waveform comparison">
+                  <span className="waveform waveform--current" />
+                  <span className="waveform waveform--historic" />
+                  <i className="waveform-marker waveform-marker--a" />
+                  <i className="waveform-marker waveform-marker--b" />
+                  <i className="waveform-marker waveform-marker--c" />
+                </div>
+                <div className="waveform-console__result">
+                  {correlated ? (
+                    <>
+                      <span><small>CORRELATION</small><b>91.4%</b></span>
+                      <p>
+                        The two emissions share a non-random harmonic structure.
+                        The historic event did not occur on Earth.
+                      </p>
+                    </>
+                  ) : (
+                    <p>
+                      Two records are available. The ring has not compared them.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {!correlated ? (
+                <button
+                  className="system-link"
+                  type="button"
+                  onClick={() => {
+                    onCorrelate();
+                    ringFeedback("confirm");
+                  }}
+                >
+                  RUN WAVEFORM CORRELATION <span>→</span>
+                </button>
+              ) : (
+                <button
+                  className="system-link"
+                  type="button"
+                  onClick={() => {
+                    setSectorNode("dark");
+                    openSystem("sector");
+                  }}
+                >
+                  TRACE MATCHING SIGNAL IN SECTOR 2814 <span>→</span>
+                </button>
+              )}
             </section>
           )}
 
@@ -956,6 +1020,7 @@ export function LanternExperience() {
   const [activeId, setActiveId] = useState<EvidenceId>("scene");
   const [lanternName, setLanternName] = useState("");
   const [ringSerial, setRingSerial] = useState(PLACEHOLDER_SERIAL);
+  const [correlated, setCorrelated] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -976,6 +1041,9 @@ export function LanternExperience() {
         ) {
           setRingSerial(parsed.ringSerial);
         }
+        if (typeof parsed.correlated === "boolean") {
+          setCorrelated(parsed.correlated);
+        }
       }
     } catch {
       // A corrupt local prototype state should never block entry.
@@ -991,9 +1059,10 @@ export function LanternExperience() {
       reviewed,
       lanternName,
       ringSerial,
+      correlated,
     };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [hydrated, lanternName, phase, reviewed, ringSerial]);
+  }, [correlated, hydrated, lanternName, phase, reviewed, ringSerial]);
 
   const openEvidence = (id: EvidenceId) => {
     setActiveId(id);
@@ -1015,6 +1084,7 @@ export function LanternExperience() {
     setActiveId("scene");
     setLanternName("");
     setRingSerial(PLACEHOLDER_SERIAL);
+    setCorrelated(false);
     setPhase("boot");
   };
 
@@ -1046,7 +1116,9 @@ export function LanternExperience() {
         <LanternScreen
           lanternName={lanternName}
           ringSerial={ringSerial}
+          correlated={correlated}
           onSetName={setLanternName}
+          onCorrelate={() => setCorrelated(true)}
           onReset={resetPrototype}
         />
       )}
