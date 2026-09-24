@@ -359,6 +359,7 @@ function CaseScreen({
               <button
                 className="interrupt-action"
                 type="button"
+                aria-label="Continue to observer scan"
                 onClick={onInterrupt}
               >
                 <span className="interrupt-action__pulse" aria-hidden="true" />
