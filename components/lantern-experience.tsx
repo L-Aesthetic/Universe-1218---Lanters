@@ -1086,9 +1086,15 @@ export function LanternExperience() {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<PersistedState>;
-        if (isPhase(parsed.phase)) setPhase(parsed.phase);
+        const persistedPhase = isPhase(parsed.phase) ? parsed.phase : "boot";
+        const persistedContactScanned = parsed.contactScanned === true;
+        const persistedCorrelated =
+          parsed.correlated === true || persistedContactScanned;
+
+        setPhase(persistedPhase);
+
         if (Array.isArray(parsed.reviewed)) {
-          setReviewed(parsed.reviewed.filter(isEvidenceId));
+          setReviewed(Array.from(new Set(parsed.reviewed.filter(isEvidenceId))));
         }
         if (typeof parsed.lanternName === "string") {
           setLanternName(parsed.lanternName.slice(0, 64));
@@ -1098,21 +1104,26 @@ export function LanternExperience() {
           /^2814-\d{8}$/.test(parsed.ringSerial)
         ) {
           setRingSerial(parsed.ringSerial);
+        } else if (persistedPhase === "lantern") {
+          setRingSerial(createRingSerial());
         }
-        if (typeof parsed.correlated === "boolean") {
-          setCorrelated(parsed.correlated);
-        }
-        if (typeof parsed.contactScanned === "boolean") {
-          setContactScanned(parsed.contactScanned);
-        }
+
+        setCorrelated(persistedCorrelated);
+        setContactScanned(persistedContactScanned);
+
         if (
           typeof parsed.selectedAt === "string" &&
           !Number.isNaN(Date.parse(parsed.selectedAt))
         ) {
           setSelectedAt(parsed.selectedAt);
+        } else if (persistedPhase === "lantern") {
+          setSelectedAt(new Date().toISOString());
         }
+
         if (Array.isArray(parsed.constructsBuilt)) {
-          setConstructsBuilt(parsed.constructsBuilt.filter(isConstructKind));
+          setConstructsBuilt(
+            Array.from(new Set(parsed.constructsBuilt.filter(isConstructKind))),
+          );
         }
       }
     } catch {
