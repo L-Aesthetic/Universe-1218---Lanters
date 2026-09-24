@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   PLACEHOLDER_SERIAL,
   STORAGE_KEY,
+  VALID_CONSTRUCTS,
   VALID_EVIDENCE_IDS,
   VALID_PHASES,
   constructPrograms,
@@ -31,6 +32,13 @@ function isEvidenceId(value: unknown): value is EvidenceId {
   return (
     typeof value === "string" &&
     VALID_EVIDENCE_IDS.includes(value as EvidenceId)
+  );
+}
+
+function isConstructKind(value: unknown): value is ConstructKind {
+  return (
+    typeof value === "string" &&
+    VALID_CONSTRUCTS.includes(value as ConstructKind)
   );
 }
 
@@ -419,9 +427,11 @@ function LanternScreen({
   correlated,
   contactScanned,
   selectedAt,
+  constructsBuilt,
   onSetName,
   onCorrelate,
   onScanContact,
+  onBuildConstruct,
   onReset,
 }: {
   lanternName: string;
@@ -429,9 +439,11 @@ function LanternScreen({
   correlated: boolean;
   contactScanned: boolean;
   selectedAt: string;
+  constructsBuilt: ConstructKind[];
   onSetName: (name: string) => void;
   onCorrelate: () => void;
   onScanContact: () => void;
+  onBuildConstruct: (kind: ConstructKind) => void;
   onReset: () => void;
 }) {
   const [draftName, setDraftName] = useState(lanternName);
@@ -508,6 +520,7 @@ function LanternScreen({
   const runConstruct = (next: ConstructKind) => {
     setConstruct(next);
     setConstructPulse((value) => value + 1);
+    onBuildConstruct(next);
     ringFeedback("confirm");
   };
 
@@ -615,7 +628,7 @@ function LanternScreen({
                         <span><small>SECTOR</small><b>2814</b></span>
                         <span><small>STATUS</small><b>PROBATIONARY</b></span>
                         <span><small>ASSIGNMENTS</small><b>01</b></span>
-                        <span><small>OPEN CASES</small><b>01</b></span>
+                        <span><small>CONSTRUCTS</small><b>{String(constructsBuilt.length).padStart(2, "0")}</b></span>
                       </div>
                       {correlated ? (
                         <div className="service-log">
@@ -987,10 +1000,16 @@ function LanternScreen({
                       <button
                         type="button"
                         key={kind}
-                        className={kind === construct ? "active" : ""}
+                        className={[
+                          kind === construct ? "active" : "",
+                          constructsBuilt.includes(kind) ? "registered" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                         onClick={() => runConstruct(kind)}
                       >
-                        {constructPrograms[kind].name}
+                        <span>{constructPrograms[kind].name}</span>
+                        <i>{constructsBuilt.includes(kind) ? "REGISTERED" : "BUILD"}</i>
                       </button>
                     ))}
                   </div>
@@ -1059,6 +1078,7 @@ export function LanternExperience() {
   const [correlated, setCorrelated] = useState(false);
   const [contactScanned, setContactScanned] = useState(false);
   const [selectedAt, setSelectedAt] = useState("");
+  const [constructsBuilt, setConstructsBuilt] = useState<ConstructKind[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -1091,6 +1111,9 @@ export function LanternExperience() {
         ) {
           setSelectedAt(parsed.selectedAt);
         }
+        if (Array.isArray(parsed.constructsBuilt)) {
+          setConstructsBuilt(parsed.constructsBuilt.filter(isConstructKind));
+        }
       }
     } catch {
       // A corrupt local prototype state should never block entry.
@@ -1109,10 +1132,12 @@ export function LanternExperience() {
       correlated,
       contactScanned,
       selectedAt,
+      constructsBuilt,
     };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [
     contactScanned,
+    constructsBuilt,
     correlated,
     hydrated,
     lanternName,
@@ -1148,6 +1173,7 @@ export function LanternExperience() {
     setCorrelated(false);
     setContactScanned(false);
     setSelectedAt("");
+    setConstructsBuilt([]);
     setPhase("boot");
   };
 
@@ -1184,9 +1210,15 @@ export function LanternExperience() {
           correlated={correlated}
           contactScanned={contactScanned}
           selectedAt={selectedAt}
+          constructsBuilt={constructsBuilt}
           onSetName={setLanternName}
           onCorrelate={() => setCorrelated(true)}
           onScanContact={() => setContactScanned(true)}
+          onBuildConstruct={(kind) =>
+            setConstructsBuilt((current) =>
+              current.includes(kind) ? current : [...current, kind],
+            )
+          }
           onReset={resetPrototype}
         />
       )}
