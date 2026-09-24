@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type Phase = "boot" | "archive" | "case" | "selection" | "lantern";
 type EvidenceId = "scene" | "witness" | "record";
@@ -23,6 +23,26 @@ type PersistedState = {
 };
 
 const STORAGE_KEY = "u1218-lantern-state-v1";
+const PLACEHOLDER_SERIAL = "2814-00000000";
+const VALID_PHASES: Phase[] = ["boot", "archive", "case", "selection", "lantern"];
+const VALID_EVIDENCE_IDS: EvidenceId[] = ["scene", "witness", "record"];
+
+function isPhase(value: unknown): value is Phase {
+  return typeof value === "string" && VALID_PHASES.includes(value as Phase);
+}
+
+function isEvidenceId(value: unknown): value is EvidenceId {
+  return (
+    typeof value === "string" &&
+    VALID_EVIDENCE_IDS.includes(value as EvidenceId)
+  );
+}
+
+function createRingSerial() {
+  const random = new Uint32Array(1);
+  window.crypto.getRandomValues(random);
+  return `2814-${String(random[0] % 100000000).padStart(8, "0")}`;
+}
 
 const evidence: Evidence[] = [
   {
@@ -564,20 +584,25 @@ export function LanternExperience() {
   const [reviewed, setReviewed] = useState<EvidenceId[]>([]);
   const [activeId, setActiveId] = useState<EvidenceId>("scene");
   const [lanternName, setLanternName] = useState("");
-  const [ringSerial, setRingSerial] = useState("2814-000000");
+  const [ringSerial, setRingSerial] = useState(PLACEHOLDER_SERIAL);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as PersistedState;
-        if (parsed.phase) setPhase(parsed.phase);
-        if (Array.isArray(parsed.reviewed)) setReviewed(parsed.reviewed);
-        if (typeof parsed.lanternName === "string") {
-          setLanternName(parsed.lanternName);
+        const parsed = JSON.parse(raw) as Partial<PersistedState>;
+        if (isPhase(parsed.phase)) setPhase(parsed.phase);
+        if (Array.isArray(parsed.reviewed)) {
+          setReviewed(parsed.reviewed.filter(isEvidenceId));
         }
-        if (typeof parsed.ringSerial === "string") {
+        if (typeof parsed.lanternName === "string") {
+          setLanternName(parsed.lanternName.slice(0, 64));
+        }
+        if (
+          typeof parsed.ringSerial === "string" &&
+          /^2814-\d{8}$/.test(parsed.ringSerial)
+        ) {
           setRingSerial(parsed.ringSerial);
         }
       }
@@ -599,20 +624,6 @@ export function LanternExperience() {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [hydrated, lanternName, phase, reviewed, ringSerial]);
 
-  const generatedSerial = useMemo(() => {
-    if (ringSerial !== "2814-000000") return ringSerial;
-    const seed =
-      typeof window === "undefined"
-        ? 1218
-        : Math.abs(
-            Array.from(window.navigator.userAgent).reduce(
-              (sum, char, index) => sum + char.charCodeAt(0) * (index + 1),
-              1218,
-            ),
-          );
-    return `2814-${String(seed % 1000000).padStart(6, "0")}`;
-  }, [ringSerial]);
-
   const openEvidence = (id: EvidenceId) => {
     setActiveId(id);
     setReviewed((current) =>
@@ -621,7 +632,9 @@ export function LanternExperience() {
   };
 
   const acceptRing = () => {
-    setRingSerial(generatedSerial);
+    if (ringSerial === PLACEHOLDER_SERIAL) {
+      setRingSerial(createRingSerial());
+    }
     setPhase("lantern");
   };
 
@@ -630,7 +643,7 @@ export function LanternExperience() {
     setReviewed([]);
     setActiveId("scene");
     setLanternName("");
-    setRingSerial("2814-000000");
+    setRingSerial(PLACEHOLDER_SERIAL);
     setPhase("boot");
   };
 
@@ -658,7 +671,7 @@ export function LanternExperience() {
       {phase === "lantern" && (
         <LanternScreen
           lanternName={lanternName}
-          ringSerial={generatedSerial}
+          ringSerial={ringSerial}
           onSetName={setLanternName}
           onReset={resetPrototype}
         />
