@@ -206,7 +206,7 @@ function ArchiveScreen({ onOpen }: { onOpen: () => void }) {
 
           <div className="archive-copy">
             <div className="eyebrow">ACTIVE INCIDENT // {CASE_META.id}</div>
-            <h2 data-phase-heading tabIndex={-1}>The body is local.<br />The signal isn't.</h2>
+            <h2 data-phase-heading tabIndex={-1}>The body is local.<br />The signal is not.</h2>
             <p>
               Local authorities logged a homicide. Corps telemetry logged
               something else. The two records cannot both be complete.
@@ -1236,6 +1236,9 @@ export function LanternExperience() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hydrated, setHydrated] = useState(false);
 
+  // This mount effect intentionally hydrates React state from the external
+  // browser storage system. It is kept isolated from ordinary render logic.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const parsed = loadPersistedState();
 
@@ -1292,6 +1295,7 @@ export function LanternExperience() {
 
     setHydrated(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!hydrated) return;
