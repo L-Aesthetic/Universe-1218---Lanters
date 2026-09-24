@@ -1395,6 +1395,45 @@ input:focus-visible {
   margin-top: 8px;
 }
 
+.service-log {
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+  padding-top: 18px;
+}
+
+.service-log > div:last-child {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 0.7fr 1fr 1.35fr;
+  margin-top: 12px;
+}
+
+.service-log span {
+  background: rgba(98, 255, 159, 0.03);
+  border: 1px solid var(--line);
+  min-height: 58px;
+  padding: 10px;
+}
+
+.service-log small,
+.service-log b {
+  display: block;
+  font-family: var(--mono);
+}
+
+.service-log small {
+  color: var(--muted);
+  font-size: 0.44rem;
+  letter-spacing: 0.07em;
+}
+
+.service-log b {
+  color: var(--green-soft);
+  font-size: 0.55rem;
+  line-height: 1.45;
+  margin-top: 7px;
+}
+
 .assignment-panel {
   display: flex;
   flex-direction: column;
@@ -2653,6 +2692,10 @@ button.archive-record:hover,
 
   .record-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .service-log > div:last-child {
+    grid-template-columns: 1fr;
   }
 
   .record-grid span:nth-child(3n + 2),
