@@ -2900,7 +2900,8 @@ button.archive-record:hover,
   }
 
   .prototype-reset {
-    display: none;
+    right: 18px;
+    top: 88px;
   }
 }
 
