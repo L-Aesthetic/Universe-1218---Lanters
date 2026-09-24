@@ -83,13 +83,19 @@ function RecordOriginBadge({ origin }: { origin: RecordOrigin }) {
 function PowerRingArtifact() {
   return (
     <span className="power-ring" aria-hidden="true">
-      <span className="power-ring__band power-ring__band--back" />
-      <span className="power-ring__shoulder power-ring__shoulder--left" />
-      <span className="power-ring__shoulder power-ring__shoulder--right" />
-      <span className="power-ring__bezel">
-        <span className="power-ring__enamel">
-          <LanternMark compact />
+      <span className="power-ring__band" />
+      <span className="power-ring__face">
+        <span className="power-ring__inlay power-ring__inlay--top" />
+        <span className="power-ring__inlay power-ring__inlay--left" />
+        <span className="power-ring__core">
+          <i className="power-ring__core-ring power-ring__core-ring--one" />
+          <i className="power-ring__core-ring power-ring__core-ring--two" />
+          <i className="power-ring__core-ring power-ring__core-ring--three" />
+          <i className="power-ring__core-ring power-ring__core-ring--four" />
+          <i className="power-ring__core-dot" />
         </span>
+        <span className="power-ring__inlay power-ring__inlay--right" />
+        <span className="power-ring__inlay power-ring__inlay--bottom" />
       </span>
       <span className="power-ring__energy" />
     </span>
