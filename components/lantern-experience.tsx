@@ -655,14 +655,35 @@ function LanternScreen({
                       </div>
                     </form>
                   ) : (
-                    <div className="record-grid">
-                      <span><small>SPECIES</small><b>HUMAN</b></span>
-                      <span><small>HOMEWORLD</small><b>EARTH</b></span>
-                      <span><small>SECTOR</small><b>2814</b></span>
-                      <span><small>STATUS</small><b>PROBATIONARY</b></span>
-                      <span><small>ASSIGNMENTS</small><b>01</b></span>
-                      <span><small>OPEN CASES</small><b>01</b></span>
-                    </div>
+                    <>
+                      <div className="record-grid">
+                        <span><small>SPECIES</small><b>HUMAN</b></span>
+                        <span><small>HOMEWORLD</small><b>EARTH</b></span>
+                        <span><small>SECTOR</small><b>2814</b></span>
+                        <span><small>STATUS</small><b>PROBATIONARY</b></span>
+                        <span><small>ASSIGNMENTS</small><b>01</b></span>
+                        <span><small>OPEN CASES</small><b>01</b></span>
+                      </div>
+                      {correlated ? (
+                        <div className="service-log">
+                          <div className="eyebrow">SERVICE LOG // LATEST ENTRY</div>
+                          <div>
+                            <span>
+                              <small>CASE</small>
+                              <b>2814-E/001</b>
+                            </span>
+                            <span>
+                              <small>ACTION</small>
+                              <b>WAVEFORM CORRELATION</b>
+                            </span>
+                            <span>
+                              <small>RESULT</small>
+                              <b>91.4% MATCH // OFF-WORLD ORIGIN</b>
+                            </span>
+                          </div>
+                        </div>
+                      ) : null}
+                    </>
                   )}
                 </div>
               </section>
