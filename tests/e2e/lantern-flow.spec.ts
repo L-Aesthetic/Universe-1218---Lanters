@@ -224,12 +224,16 @@ test("construct training uses the interactive 3D renderer", async ({ page }) => 
 
   await page.getByRole("button", { name: /construct/i }).click();
 
-  const viewport = page.getByRole("region", {
-    name: /interactive three-dimensional defensive shield construct/i,
-  });
+  const viewport = page
+    .locator(".construct-viewport")
+    .filter({ has: page.locator("canvas") });
   const canvas = viewport.locator("canvas");
 
   await expect(viewport).toBeVisible();
+  await expect(viewport).toHaveAttribute(
+    "aria-label",
+    /interactive three-dimensional defensive shield construct/i,
+  );
   await expect(canvas).toHaveAttribute("data-renderer", /webgl|fallback/);
 
   await canvas.focus();
@@ -240,19 +244,17 @@ test("construct training uses the interactive 3D renderer", async ({ page }) => 
     .getByRole("button", { name: /load-bearing bridge/i })
     .click();
 
-  await expect(
-    page.getByRole("region", {
-      name: /interactive three-dimensional load-bearing bridge/i,
-    }),
-  ).toBeVisible();
+  await expect(viewport).toHaveAttribute(
+    "aria-label",
+    /interactive three-dimensional load-bearing bridge/i,
+  );
 
   await page
     .getByRole("button", { name: /distress beacon/i })
     .click();
 
-  await expect(
-    page.getByRole("region", {
-      name: /interactive three-dimensional distress beacon/i,
-    }),
-  ).toBeVisible();
+  await expect(viewport).toHaveAttribute(
+    "aria-label",
+    /interactive three-dimensional distress beacon/i,
+  );
 });
