@@ -59,8 +59,9 @@ test("case intelligence advances instead of leaving stale objectives", async ({
 
   await page.getByRole("button", { name: /trace matching signal/i }).click();
 
-  await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
-  await expect(page.getByText(/local ring projection.*not to scale/i)).toBeVisible();
+  await expect(
+    page.getByText(/local model.*ring projection.*not to scale/i),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "UNKNOWN CONTACT", exact: true }),
   ).toBeVisible();
