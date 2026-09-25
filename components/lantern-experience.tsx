@@ -8,6 +8,8 @@ import {
   caseTimeline,
   constructPrograms,
   evidence,
+  SECTOR_PROJECTION_NOTE,
+  sectorEchoOrigins,
   sectorNodes,
 } from "../lib/lanterns/data";
 import { CASE_META, ORIGINS } from "../lib/lanterns/canon";
@@ -35,7 +37,6 @@ import type {
   PersistedState,
   Phase,
   RingSystem,
-  SectorNodeId,
 } from "../lib/lanterns/types";
 import type { RecordOrigin } from "../lib/lanterns/canon";
 
@@ -1140,18 +1141,74 @@ function LanternScreen({
                   <div className="eyebrow">SECTOR NAVIGATION</div>
                   <h2 data-system-heading tabIndex={-1}>Sector 2814.</h2>
                 </span>
-                <Classification value="LIVE MAP" />
+                <Classification value="LOCAL MODEL" />
               </div>
               <div className="sector-field">
-                <div className="sector-radar" aria-hidden="true">
-                  <span className="sector-ring sector-ring--a" />
-                  <span className="sector-ring sector-ring--b" />
-                  <span className="sector-ring sector-ring--c" />
-                  <span className="sector-axis sector-axis--x" />
-                  <span className="sector-axis sector-axis--y" />
-                  <i className="sector-point sector-point--earth" />
-                  <i className="sector-point sector-point--relay" />
-                  <i className="sector-point sector-point--unknown" />
+                <div className="sector-projection">
+                  <div
+                    className="sector-radar"
+                    aria-label="Sector 2814 local ring projection, not to scale"
+                  >
+                    <span className="sector-ring sector-ring--a" aria-hidden="true" />
+                    <span className="sector-ring sector-ring--b" aria-hidden="true" />
+                    <span className="sector-ring sector-ring--c" aria-hidden="true" />
+                    <span className="sector-axis sector-axis--x" aria-hidden="true" />
+                    <span className="sector-axis sector-axis--y" aria-hidden="true" />
+
+                    {sectorNodes.map((node) => {
+                      if (!node.projection) return null;
+
+                      if (node.id === "dark" && contactScanned) {
+                        return sectorEchoOrigins.map((point, index) => (
+                          <button
+                            type="button"
+                            key={`echo-${index}`}
+                            className={[
+                              "sector-point",
+                              "sector-point--contact",
+                              "sector-point--echo",
+                              sectorNode === "dark" ? "active" : "",
+                            ].filter(Boolean).join(" ")}
+                            style={{
+                              left: `${point.x}%`,
+                              top: `${point.y}%`,
+                            }}
+                            aria-label={`Unknown contact return ${index + 1} of ${sectorEchoOrigins.length}`}
+                            onClick={() => {
+                              setSectorNode("dark");
+                              feedback("alert");
+                            }}
+                          />
+                        ));
+                      }
+
+                      return (
+                        <button
+                          type="button"
+                          key={node.id}
+                          className={[
+                            "sector-point",
+                            node.id === "dark"
+                              ? "sector-point--contact"
+                              : "sector-point--known",
+                            sectorNode === node.id ? "active" : "",
+                          ].filter(Boolean).join(" ")}
+                          style={{
+                            left: `${node.projection.x}%`,
+                            top: `${node.projection.y}%`,
+                          }}
+                          aria-label={node.name}
+                          onClick={() => {
+                            setSectorNode(node.id);
+                            feedback(node.id === "dark" ? "alert" : "soft");
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  <small className="sector-projection__note">
+                    {SECTOR_PROJECTION_NOTE}
+                  </small>
                 </div>
                 <div className="sector-node-stack">
                   <div className="sector-node-list">
@@ -1161,7 +1218,7 @@ function LanternScreen({
                         key={node.id}
                         className={sectorNode === node.id ? "active" : ""}
                         onClick={() => {
-                          setSectorNode(node.id as SectorNodeId);
+                          setSectorNode(node.id);
                           feedback(node.id === "dark" ? "alert" : "soft");
                         }}
                       >
@@ -1176,7 +1233,11 @@ function LanternScreen({
                   <div className="sector-inspector">
                     <small>SELECTED CONTACT</small>
                     <b>{activeSector.name}</b>
-                    <p>{activeSector.detail}</p>
+                    <p>
+                      {activeSector.id === "dark" && contactScanned
+                        ? "THREE RETURN PATHS // RANGE UNRESOLVED"
+                        : activeSector.detail}
+                    </p>
                     <span>
                       {activeSector.id === "dark" && contactScanned
                         ? "ECHO DETECTED"
@@ -1188,7 +1249,7 @@ function LanternScreen({
                         <em>
                           {contactScanned
                             ? "The same signature is arriving from three incompatible coordinates. The ring classifies the contact as an echo, not a single object."
-                            : "Bearing remains fixed while distance changes. The ring cannot reconcile the contact with known local motion."}
+                            : "Direction remains stable while range changes. The ring cannot reconcile the contact with known local motion."}
                         </em>
                         {correlated && !contactScanned ? (
                           <button
