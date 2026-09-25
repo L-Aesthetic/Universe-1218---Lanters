@@ -232,7 +232,7 @@ test("construct training uses the interactive 3D renderer", async ({ page }) => 
   await expect(viewport).toBeVisible();
   await expect(viewport).toHaveAttribute(
     "aria-label",
-    /interactive three-dimensional defensive shield construct/i,
+    /interactive three-dimensional defensive shield/i,
   );
   await expect(canvas).toHaveAttribute("data-renderer", /webgl|fallback/);
 
