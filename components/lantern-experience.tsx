@@ -774,9 +774,6 @@ function LanternScreen({
                           </div>
                         </div>
                       ) : null}
-                          </div>
-                        </div>
-                      ) : null}
                     </>
                   )}
                 </div>
