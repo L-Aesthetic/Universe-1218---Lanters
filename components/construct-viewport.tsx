@@ -382,6 +382,8 @@ export function ConstructViewport({
         ref={canvasRef}
         className="construct-viewport__canvas"
         tabIndex={0}
+        role="application"
+        aria-roledescription="3D construct viewport"
         aria-label={`Interactive three-dimensional ${label}. Drag to orbit. Pinch or scroll to zoom. Arrow keys rotate; plus and minus zoom.`}
       />
       <div className="construct-viewport__instructions" aria-hidden="true">
