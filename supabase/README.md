@@ -14,6 +14,25 @@ Before this schema becomes a migration:
 6. Fix all relevant findings.
 7. Only then create/pull the canonical migration into this repository.
 
+## Selection → account → durable ring identity
+
+The current browser-only prototype can generate a local ring number immediately for the selection fantasy. That number is **not** the authority model for the shared Corps.
+
+When the dedicated backend is connected:
+
+1. The visitor completes the three-record selection sequence.
+2. The user authenticates or creates an account only after selection.
+3. A server route calls `server_claim_lantern_identity` with the authenticated user id and the ordered evidence trace.
+4. PostgreSQL validates that `scene`, `witness`, and `record` each occurred exactly once.
+5. The database stores a server-side selection claim.
+6. The database allocates the permanent `2814-########` serial.
+7. The profile and selection claim are committed in the same transaction.
+8. Repeating the claim for the same account returns the existing profile instead of minting a second identity.
+
+`server_claim_lantern_identity` is `SECURITY DEFINER`, but it uses an empty search path, fully qualified object names, is revoked from `public`, `anon`, and `authenticated`, and is executable only by `service_role`. It must be called from trusted server code; the secret/service key must never reach the browser.
+
+The browser does not receive INSERT permission on `lantern_profiles` or `lantern_selection_claims`, and it cannot choose its permanent ring serial, selection timestamp, status, or selection receipt.
+
 ## Authority model
 
 Client code must **not** be able to award itself:
