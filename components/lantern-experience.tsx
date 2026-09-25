@@ -965,7 +965,7 @@ function LanternScreen({
                 </div>
 
                 <div className="assignment-panel__body">
-                  <div>
+                  <div className="assignment-current">
                     <span className="assignment-pulse" aria-hidden="true" />
                     <p>
                       {currentAssignment?.title ?? "NO ACTIVE ASSIGNMENT"}
