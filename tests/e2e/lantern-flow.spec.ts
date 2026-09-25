@@ -116,3 +116,33 @@ test("case reconstruction reveals only reviewed timeline evidence", async ({ pag
   ).toBeVisible();
   await expect(page.getByText(/local timeline is incomplete/i)).toBeVisible();
 });
+
+
+test("ring reconstruction scrubs only through revealed events", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /establish archive link/i }).click();
+  await page.getByRole("button", { name: /open incident/i }).click();
+  await page.getByRole("button", { name: /energy trace/i }).click();
+
+  const scrubber = page.getByRole("slider", { name: /reconstruction event/i });
+  await expect(scrubber).toHaveAttribute("max", "1");
+  await expect(scrubber).toHaveAttribute(
+    "aria-valuetext",
+    /02:13:41\.811, anomalous emission/i,
+  );
+  await expect(page.getByText(/unknown emission/i)).toBeVisible();
+
+  await page
+    .getByRole("button", { name: /02:17:41\.811.*body discovered/i })
+    .click();
+  await expect(page.getByText(/body position recorded/i)).toBeVisible();
+
+  await page.getByRole("button", { name: /the light came first/i }).click();
+  await expect(scrubber).toHaveAttribute("max", "4");
+
+  await page
+    .getByRole("button", { name: /02:17.*power outage logged/i })
+    .click();
+  await expect(page.getByText(/municipal grid loss/i)).toBeVisible();
+  await expect(page.getByText(/body position recorded/i)).toHaveCount(0);
+});
