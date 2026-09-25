@@ -37,6 +37,7 @@ import type {
   PersistedState,
   Phase,
   RingSystem,
+  SectorNodeId,
 } from "../lib/lanterns/types";
 import type { RecordOrigin } from "../lib/lanterns/canon";
 
