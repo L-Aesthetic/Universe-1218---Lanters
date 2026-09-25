@@ -20,6 +20,12 @@ test("selection becomes a persistent Lantern record", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /human of earth/i }),
   ).toBeVisible();
+  await expect(
+    page.getByText(/selection basis.*in-case actions only/i),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/no personal profile.*activity outside this investigation/i),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: /put on the ring/i }).click();
   await expect(page.getByText(/corps service record/i)).toBeVisible();

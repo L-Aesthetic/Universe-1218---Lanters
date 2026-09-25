@@ -1639,6 +1639,33 @@ input:focus-visible {
   max-width: 520px;
 }
 
+.selection-basis {
+  border-top: 1px solid rgba(154, 177, 165, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: -8px auto 14px;
+  max-width: 520px;
+  padding-top: 10px;
+}
+
+.selection-basis small,
+.selection-basis span {
+  font-family: var(--mono);
+}
+
+.selection-basis small {
+  color: rgba(166, 255, 200, 0.68);
+  font-size: 0.48rem;
+  letter-spacing: 0.08em;
+}
+
+.selection-basis span {
+  color: #73897d;
+  font-size: 0.55rem;
+  line-height: 1.5;
+}
+
 .accept-ring:disabled {
   cursor: default;
   opacity: 0.72;
