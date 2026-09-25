@@ -47,6 +47,7 @@ export const caseTimeline: CaseTimelineEvent[] = [
     detail: "Ring telemetry records a 0.81 second event north of the later body position.",
     source: "RING TELEMETRY",
     certainty: "exact",
+    evidenceId: "scene",
   },
   {
     id: "witness-flash",
@@ -55,6 +56,7 @@ export const caseTimeline: CaseTimelineEvent[] = [
     detail: "Witness timing is approximate and independently overlaps the first camera metadata corruption.",
     source: "WITNESS",
     certainty: "approximate",
+    evidenceId: "witness",
   },
   {
     id: "camera-corruption",
@@ -63,6 +65,7 @@ export const caseTimeline: CaseTimelineEvent[] = [
     detail: "Street camera metadata begins corrupting before the municipal incident log starts.",
     source: "MUNICIPAL",
     certainty: "approximate",
+    evidenceId: "witness",
   },
   {
     id: "grid-outage",
@@ -71,6 +74,7 @@ export const caseTimeline: CaseTimelineEvent[] = [
     detail: "The local incident sequence begins with the municipal grid failure.",
     source: "MUNICIPAL",
     certainty: "exact",
+    evidenceId: "witness",
   },
   {
     id: "body-discovered",
@@ -79,6 +83,7 @@ export const caseTimeline: CaseTimelineEvent[] = [
     detail: "Discovery occurs exactly four minutes after the ring-recorded emission.",
     source: "DISCOVERY",
     certainty: "exact",
+    evidenceId: "scene",
   },
 ];
 
