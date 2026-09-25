@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  CURRENT_TRACE,
   WAVEFORM_MATCH_PERCENT,
   pearsonCorrelation,
+  toWaveformPoints,
 } from "./waveform";
 
 describe("pearsonCorrelation", () => {
@@ -21,5 +23,11 @@ describe("pearsonCorrelation", () => {
 
   it("derives the displayed case match from the stored sample set", () => {
     expect(WAVEFORM_MATCH_PERCENT).toBe(91.4);
+  });
+
+  it("renders one visible point for every stored sample", () => {
+    expect(toWaveformPoints(CURRENT_TRACE).split(" ")).toHaveLength(
+      CURRENT_TRACE.length,
+    );
   });
 });
