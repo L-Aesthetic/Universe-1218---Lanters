@@ -46,4 +46,5 @@ export type CaseTimelineEvent = {
   detail: string;
   source: "RING TELEMETRY" | "WITNESS" | "MUNICIPAL" | "DISCOVERY";
   certainty: "exact" | "approximate";
+  evidenceId: EvidenceId;
 };
