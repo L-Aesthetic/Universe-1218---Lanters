@@ -31,7 +31,9 @@ export function CorpsNetworkPanel({
 
       <div className="corps-network-grid">
         <article className="corps-network-status">
-          <small>NETWORK STATE</small>
+          <small>
+            NETWORK STATE // {status.state.replace("_", " ")}
+          </small>
           <p>{status.headline}</p>
           <span>{status.detail}</span>
 
