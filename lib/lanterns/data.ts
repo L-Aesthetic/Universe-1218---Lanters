@@ -4,6 +4,8 @@ import type {
   Evidence,
   EvidenceId,
   Phase,
+  SectorNode,
+  SectorProjectionPoint,
 } from "./types";
 import { ORIGINS } from "./canon";
 import { addMillisecondsToClock } from "./time";
@@ -146,18 +148,19 @@ export const evidence: Evidence[] = [
   },
 ];
 
-export const sectorNodes = [
+export const sectorNodes: readonly SectorNode[] = [
   {
     id: "sol",
     name: "SOL",
     detail: "LOCAL SYSTEM // EARTH",
     status: "ACTIVE",
     origin: ORIGINS.u1218Adaptation,
+    projection: { x: 50, y: 50 },
   },
   {
     id: "oa",
     name: "OA",
-    detail: "CORPS CENTRAL // ROUTE CLASSIFIED",
+    detail: "CORPS CENTRAL // LOCAL ROUTE WITHHELD",
     status: "LINKED",
     origin: ORIGINS.dcCorps,
   },
@@ -167,15 +170,26 @@ export const sectorNodes = [
     detail: "DEEP-SPACE ARCHIVE RELAY",
     status: "ONLINE",
     origin: ORIGINS.u1218Original,
+    projection: { x: 72, y: 32 },
   },
   {
     id: "dark",
     name: "UNKNOWN CONTACT",
-    detail: "BEARING 044.18 // DISTANCE UNRESOLVED",
+    detail: "DIRECTION STABLE // RANGE UNRESOLVED",
     status: "UNRESOLVED",
     origin: ORIGINS.u1218Original,
+    projection: { x: 28, y: 67 },
   },
-] as const;
+];
+
+export const sectorEchoOrigins: readonly SectorProjectionPoint[] = [
+  { x: 28, y: 67 },
+  { x: 22, y: 58 },
+  { x: 36, y: 73 },
+];
+
+export const SECTOR_PROJECTION_NOTE =
+  "LOCAL RING PROJECTION // NOT TO SCALE // ROUTE DISTANCES UNRESOLVED";
 
 export const constructPrograms: Record<
   ConstructKind,
