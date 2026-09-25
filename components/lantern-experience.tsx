@@ -883,10 +883,9 @@ function LanternScreen({
                     </svg>
                   </div>
                   <figcaption className="sr-only">
-                    Waveform comparison between the current Rushville trace and
-                    sealed record 2814 delta 19. A completed analysis shows a
-                    {WAVEFORM_MATCH_PERCENT} percent correlation across the stored
-                    samples.
+                    {correlated
+                      ? `Waveform comparison between the current Rushville trace and sealed record 2814 delta 19. The stored samples produce a ${WAVEFORM_MATCH_PERCENT} percent Pearson correlation.`
+                      : "Two stored waveform traces are available. The ring has not run a correlation analysis yet."}
                   </figcaption>
                 </figure>
                 <div className="waveform-console__result">
@@ -897,8 +896,9 @@ function LanternScreen({
                         <b>{WAVEFORM_MATCH_PERCENT}%</b>
                       </span>
                       <p>
-                        The two emissions share a non-random harmonic structure.
-                        The historic event did not occur on Earth.
+                        The stored trace shapes correlate strongly across the
+                        sample window. The historic record places the earlier
+                        event off-world.
                       </p>
                     </>
                   ) : (
