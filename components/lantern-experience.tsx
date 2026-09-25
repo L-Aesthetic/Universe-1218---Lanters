@@ -13,6 +13,13 @@ import {
   sectorNodes,
 } from "../lib/lanterns/data";
 import { CASE_META, ORIGINS } from "../lib/lanterns/canon";
+import {
+  deriveAssignments,
+  getCurrentAssignment,
+} from "../lib/corps/assignments";
+import { LOCAL_CORPS_SNAPSHOT, describeCorpsNetwork } from "../lib/corps/network";
+import { askRing } from "../lib/corps/ring-query";
+import type { RingQueryResult } from "../lib/corps/domain";
 import { createRingSerial, ringFeedback } from "../lib/lanterns/device";
 import {
   deriveCaseIntelligence,
@@ -641,6 +648,8 @@ function LanternScreen({
   >("idle");
   const [announcement, setAnnouncement] = useState("");
   const [resetArmed, setResetArmed] = useState(false);
+  const [ringQuery, setRingQuery] = useState("");
+  const [ringAnswer, setRingAnswer] = useState<RingQueryResult | null>(null);
   const hasName = lanternName.trim().length > 0;
   const selectedLabel = selectedAt
     ? new Intl.DateTimeFormat("en-US", {
@@ -690,6 +699,20 @@ function LanternScreen({
     contactScanned,
   });
 
+  const runtimeContext = {
+    reviewed,
+    correlated,
+    contactScanned,
+    constructsBuilt,
+    selected: true,
+  };
+  const assignments = deriveAssignments(runtimeContext);
+  const currentAssignment = getCurrentAssignment(assignments);
+  const completeAssignments = assignments.filter(
+    (assignment) => assignment.state === "complete",
+  ).length;
+  const networkStatus = describeCorpsNetwork(LOCAL_CORPS_SNAPSHOT);
+
   const serviceEvents = [
     correlated
       ? {
@@ -725,6 +748,19 @@ function LanternScreen({
   const openSystem = (next: RingSystem) => {
     feedback(next === "construct" ? "confirm" : "soft");
     setSystem(next);
+  };
+
+  const runRingQuery = (query: string) => {
+    const cleaned = query.trim();
+    if (!cleaned) return;
+
+    const result = askRing(cleaned, runtimeContext);
+    setRingQuery(cleaned);
+    setRingAnswer(result);
+    setAnnouncement(
+      `Ring query complete. Classification: ${result.classification}.`,
+    );
+    feedback(result.classification === "RESTRICTED" ? "alert" : "soft");
   };
 
   const runConstruct = (next: ConstructKind) => {
@@ -791,6 +827,14 @@ function LanternScreen({
             </span>
           </div>
           <div className="lantern-header__status">
+            <button
+              className="ring-query-launch"
+              type="button"
+              onClick={() => openSystem("ask")}
+              aria-current={system === "ask" ? "page" : undefined}
+            >
+              ASK RING
+            </button>
             <button
               className="ring-audio-toggle"
               type="button"
@@ -875,7 +919,10 @@ function LanternScreen({
                         <span><small>HOMEWORLD</small><b>EARTH</b></span>
                         <span><small>SECTOR</small><b>2814</b></span>
                         <span><small>STATUS</small><b>ACTIVE</b></span>
-                        <span><small>ASSIGNMENTS</small><b>01</b></span>
+                        <span>
+                          <small>ASSIGNMENTS</small>
+                          <b>{String(completeAssignments).padStart(2, "0")} / {String(assignments.length).padStart(2, "0")}</b>
+                        </span>
                         <span><small>CONSTRUCTS</small><b>{String(constructsBuilt.length).padStart(2, "0")}</b></span>
                       </div>
                       {serviceEvents.length > 0 ? (
@@ -910,35 +957,68 @@ function LanternScreen({
                 <div className="assignment-panel__heading">
                   <span>
                     <small>CURRENT ASSIGNMENT</small>
-                    <b>2814-E/001</b>
+                    <b>{currentAssignment?.id ?? CASE_META.id}</b>
                   </span>
-                  <Classification value={caseIntel.status} />
+                  <Classification
+                    value={(currentAssignment?.state ?? "active").toUpperCase()}
+                  />
                 </div>
 
                 <div className="assignment-panel__body">
-                  <div>
+                  <div className="assignment-current">
                     <span className="assignment-pulse" aria-hidden="true" />
                     <p>
-                      The ring reopened the case from the evidence you reviewed.
-                      Your findings now change what the archive asks next.
+                      {currentAssignment?.title ?? "NO ACTIVE ASSIGNMENT"}
                     </p>
                   </div>
                   <dl>
-                    <div><dt>OBJECTIVE</dt><dd>{caseIntel.objective}</dd></div>
-                    <div><dt>CASE STAGE</dt><dd>{caseIntel.stage.toUpperCase()}</dd></div>
-                    <div><dt>RING STATUS</dt><dd>NOMINAL</dd></div>
+                    <div>
+                      <dt>OBJECTIVE</dt>
+                      <dd>{currentAssignment?.objective ?? caseIntel.objective}</dd>
+                    </div>
+                    <div>
+                      <dt>CASE STAGE</dt>
+                      <dd>{caseIntel.stage.toUpperCase()}</dd>
+                    </div>
+                    <div>
+                      <dt>CORPS NETWORK</dt>
+                      <dd>{networkStatus.state.replace("_", " ")}</dd>
+                    </div>
                   </dl>
-                  <div className="finding-strip" aria-label="current case findings">
-                    {caseIntel.findings.slice(-3).map((finding) => (
-                      <span key={finding.id}>
-                        <small>{finding.confidence}</small>
-                        <b>{finding.label}</b>
-                      </span>
+
+                  <div className="assignment-sequence" aria-label="assignment sequence">
+                    {assignments.map((assignment) => (
+                      <div
+                        className={[
+                          "assignment-sequence__row",
+                          `assignment-sequence__row--${assignment.state}`,
+                        ].join(" ")}
+                        key={assignment.id}
+                      >
+                        <span>
+                          <small>{assignment.id}</small>
+                          <b>{assignment.title}</b>
+                        </span>
+                        <i>{assignment.state.toUpperCase()}</i>
+                      </div>
                     ))}
                   </div>
-                  <button className="system-link" type="button" onClick={() => openSystem("case")}>
-                    OPEN FIELD ASSIGNMENT <span>→</span>
-                  </button>
+
+                  {currentAssignment?.state === "queued" ? (
+                    <div className="case-next-locked">
+                      <span>NEXT TOOL</span>
+                      <b>{currentAssignment.title}</b>
+                      <small>{currentAssignment.dependency}</small>
+                    </div>
+                  ) : currentAssignment ? (
+                    <button
+                      className="system-link"
+                      type="button"
+                      onClick={() => openSystem(currentAssignment.targetSystem)}
+                    >
+                      OPEN {currentAssignment.targetSystem.toUpperCase()} <span>→</span>
+                    </button>
+                  ) : null}
                 </div>
               </section>
             </div>
@@ -1302,6 +1382,112 @@ function LanternScreen({
                       </em>
                     )}
                   </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {system === "ask" && (
+            <section className="system-panel system-panel--ask">
+              <div className="system-panel__header">
+                <span>
+                  <div className="eyebrow">RING QUERY // GROUNDED ARCHIVE</div>
+                  <h2 data-system-heading tabIndex={-1}>Ask the ring.</h2>
+                </span>
+                <Classification value="SOURCE-BOUND" />
+              </div>
+
+              <div className="ring-query-layout">
+                <div className="ring-query-input">
+                  <p>
+                    The ring answers only from records available in your current
+                    case state and labeled Corps references. It will mark
+                    inference, restriction, and unknowns instead of filling gaps.
+                  </p>
+
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      runRingQuery(ringQuery);
+                    }}
+                  >
+                    <label htmlFor="ring-query">QUERY</label>
+                    <div>
+                      <input
+                        id="ring-query"
+                        value={ringQuery}
+                        onChange={(event) => setRingQuery(event.target.value)}
+                        maxLength={240}
+                        placeholder="Why was the prior record sealed?"
+                      />
+                      <button type="submit">ASK</button>
+                    </div>
+                  </form>
+
+                  <div className="ring-query-prompts" aria-label="suggested ring queries">
+                    {[
+                      "What is Oa?",
+                      "Why was the prior record sealed?",
+                      contactScanned
+                        ? "What do we know about the spatial echo?"
+                        : "Where did the matching signal originate?",
+                    ].map((prompt) => (
+                      <button
+                        type="button"
+                        key={prompt}
+                        onClick={() => runRingQuery(prompt)}
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="ring-query-response" aria-live="polite">
+                  {ringAnswer ? (
+                    <>
+                      <div className="ring-query-response__classification">
+                        <Classification value={ringAnswer.classification} />
+                        <span>
+                          {String(ringAnswer.citations.length).padStart(2, "0")} SOURCES
+                        </span>
+                      </div>
+                      <p>{ringAnswer.answer}</p>
+                      {ringAnswer.citations.length > 0 ? (
+                        <ol className="ring-citations">
+                          {ringAnswer.citations.map((citation) => (
+                            <li key={citation.id}>
+                              <span>
+                                <small>{citation.authority}</small>
+                                <b>{citation.title}</b>
+                                <em>{citation.sourceLabel}</em>
+                              </span>
+                              {citation.sourceUrl ? (
+                                <a
+                                  href={citation.sourceUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  SOURCE ↗
+                                </a>
+                              ) : (
+                                <i>LOCAL RECORD</i>
+                              )}
+                            </li>
+                          ))}
+                        </ol>
+                      ) : null}
+                    </>
+                  ) : (
+                    <div className="ring-query-empty">
+                      <LanternMark compact />
+                      <b>NO QUERY ACTIVE</b>
+                      <span>
+                        Ask about the case, Sector 2814, constructs, Oa, or an
+                        unlocked record.
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </section>
