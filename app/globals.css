@@ -2742,16 +2742,8 @@ button.archive-record:hover,
 
 .sector-point--echo {
   height: 7px;
-  opacity: 0.82;
+  opacity: 0.78;
   width: 7px;
-}
-
-.sector-point--echo:nth-of-type(2) {
-  opacity: 0.55;
-}
-
-.sector-point--echo:nth-of-type(3) {
-  opacity: 0.68;
 }
 
 .sector-node-stack {
