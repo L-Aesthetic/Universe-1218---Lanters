@@ -58,10 +58,23 @@ test("case intelligence advances instead of leaving stale objectives", async ({
   ).toBeVisible();
 
   await page.getByRole("button", { name: /trace matching signal/i }).click();
-  await page.getByRole("button", { name: /unknown contact/i }).click();
+
+  await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
+  await expect(page.getByText(/local ring projection.*not to scale/i)).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "UNKNOWN CONTACT", exact: true }),
+  ).toBeVisible();
+
+  await page
+    .locator(".sector-node-list button")
+    .filter({ hasText: "UNKNOWN CONTACT" })
+    .click();
   await page.getByRole("button", { name: /scan unresolved contact/i }).click();
 
   await expect(page.getByText(/echo detected/i).first()).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /unknown contact return/i }),
+  ).toHaveCount(3);
 
   await page.getByRole("button", { name: /case/i }).click();
   await expect(
