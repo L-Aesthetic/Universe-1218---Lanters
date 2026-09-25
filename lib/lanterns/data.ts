@@ -122,27 +122,35 @@ export const constructPrograms: Record<
     note: string;
     origin: typeof ORIGINS.u1218Original | typeof ORIGINS.u1218Adaptation;
     buildOrder: string[];
+    structure: string;
+    trainingClass: string;
   }
 > = {
   shield: {
     name: "DEFENSIVE SHIELD",
     purpose: "Disperse frontal impact across a continuous energy surface.",
-    note: "Stable. Low complexity. Suitable for first-form training.",
+    note: "A continuous surface is only the last layer; the ring resolves the rim and internal bracing first.",
     origin: ORIGINS.u1218Adaptation,
     buildOrder: ["FIELD AXIS", "RIM", "INNER BRACING", "ENERGY SURFACE"],
+    structure: "RADIAL BRACING",
+    trainingClass: "DEFENSIVE FORM",
   },
   bridge: {
     name: "LOAD-BEARING BRIDGE",
     purpose: "Carry distributed weight across an unsupported span.",
-    note: "Structural members must resolve load before the surface is filled.",
+    note: "Structural members must resolve the load path before the walking surface is filled.",
     origin: ORIGINS.u1218Adaptation,
     buildOrder: ["LOAD PATH", "SUPPORTS", "JOINTS", "WALKING SURFACE"],
+    structure: "SUPPORTED SPAN",
+    trainingClass: "STRUCTURAL FORM",
   },
   beacon: {
     name: "DISTRESS BEACON",
     purpose: "Broadcast a Corps-recognizable emergency signature.",
-    note: "Non-combat construct. High persistence, low energy demand.",
+    note: "The exercise is about maintaining a clear carrier pattern rather than building a weapon.",
     origin: ORIGINS.u1218Original,
     buildOrder: ["CORE", "CARRIER", "REPEATER FIELD", "BROADCAST"],
+    structure: "CONCENTRIC CARRIER",
+    trainingClass: "UTILITY FORM",
   },
 };
