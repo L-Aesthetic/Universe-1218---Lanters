@@ -37,7 +37,7 @@ test("selection becomes a persistent Lantern record", async ({ page }) => {
   await page.reload();
 
   await expect(page.getByText(original ?? "")).toBeVisible();
-  await expect(page.getByRole("button", { name: /case/i })).toBeVisible();
+  await expect(page.locator(".ring-dock").getByRole("button", { name: /case/i })).toBeVisible();
 });
 
 test("case intelligence advances instead of leaving stale objectives", async ({
@@ -45,7 +45,7 @@ test("case intelligence advances instead of leaving stale objectives", async ({
 }) => {
   await reachSelection(page);
   await page.getByRole("button", { name: /put on the ring/i }).click();
-  await page.getByRole("button", { name: /case/i }).click();
+  await page.locator(".ring-dock").getByRole("button", { name: /case/i }).click();
 
   await expect(
     page.getByRole("heading", { name: /why was the prior-contact record sealed/i }),
@@ -83,7 +83,7 @@ test("case intelligence advances instead of leaving stale objectives", async ({
     page.getByRole("button", { name: /unknown contact return/i }),
   ).toHaveCount(3);
 
-  await page.getByRole("button", { name: /case/i }).click();
+  await page.locator(".ring-dock").getByRole("button", { name: /case/i }).click();
   await expect(
     page.getByRole("heading", {
       name: /how can one signature arrive from three places/i,
