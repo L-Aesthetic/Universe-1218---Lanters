@@ -17,7 +17,12 @@ import {
   deriveCaseIntelligence,
   deriveSelectionObservation,
 } from "../lib/lanterns/intelligence";
-import { WAVEFORM_MATCH_PERCENT } from "../lib/lanterns/waveform";
+import {
+  CURRENT_TRACE,
+  HISTORIC_TRACE,
+  WAVEFORM_MATCH_PERCENT,
+  toWaveformPoints,
+} from "../lib/lanterns/waveform";
 import {
   clearPersistedState,
   loadPersistedState,
@@ -862,11 +867,20 @@ function LanternScreen({
                 </div>
                 <figure className="waveform-figure">
                   <div className="waveform-plot" aria-hidden="true">
-                    <span className="waveform waveform--current" />
-                    <span className="waveform waveform--historic" />
-                    <i className="waveform-marker waveform-marker--a" />
-                    <i className="waveform-marker waveform-marker--b" />
-                    <i className="waveform-marker waveform-marker--c" />
+                    <svg
+                      className="waveform-svg"
+                      viewBox="0 0 100 100"
+                      preserveAspectRatio="none"
+                    >
+                      <polyline
+                        className="waveform-line waveform-line--current"
+                        points={toWaveformPoints(CURRENT_TRACE)}
+                      />
+                      <polyline
+                        className="waveform-line waveform-line--historic"
+                        points={toWaveformPoints(HISTORIC_TRACE)}
+                      />
+                    </svg>
                   </div>
                   <figcaption className="sr-only">
                     Waveform comparison between the current Rushville trace and
