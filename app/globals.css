@@ -797,9 +797,7 @@ input:focus-visible {
   min-height: 280px;
   overflow: hidden;
   position: relative;
-  background:
-    radial-gradient(circle at 62% 46%, rgba(42, 255, 125, 0.08), transparent 18%),
-    #030a06;
+  background: #030a06;
 }
 
 .forensic-field > div {
@@ -919,6 +917,138 @@ input:focus-visible {
   font-size: 0.48rem;
 }
 
+
+.forensic-field--emission {
+  background:
+    radial-gradient(circle at 64% 36%, rgba(42, 255, 125, 0.09), transparent 20%),
+    #030a06;
+}
+
+.forensic-empty,
+.forensic-camera-state,
+.forensic-outage-state {
+  font-family: var(--mono);
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(76%, 560px);
+}
+
+.forensic-empty {
+  color: rgba(137, 158, 146, 0.48);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+}
+
+.forensic-later-position {
+  border: 1px dashed rgba(152, 174, 162, 0.28);
+  color: rgba(162, 183, 171, 0.5);
+  font-family: var(--mono);
+  font-size: 0.47rem;
+  left: 34%;
+  letter-spacing: 0.07em;
+  padding: 8px 10px;
+  position: absolute;
+  top: 47%;
+  transform: translate(-50%, -50%);
+}
+
+.forensic-witness-zone {
+  align-items: center;
+  border: 1px dashed rgba(98, 255, 159, 0.28);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  height: min(38vw, 220px);
+  justify-content: center;
+  left: 54%;
+  position: absolute;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: min(38vw, 220px);
+}
+
+.forensic-witness-zone i {
+  background: rgba(98, 255, 159, 0.82);
+  border-radius: 50%;
+  box-shadow: 0 0 34px rgba(98, 255, 159, 0.45);
+  height: 8px;
+  margin-bottom: 12px;
+  width: 8px;
+}
+
+.forensic-witness-zone b,
+.forensic-witness-zone small,
+.forensic-camera-state b,
+.forensic-camera-state small,
+.forensic-outage-state b,
+.forensic-outage-state small,
+.forensic-discovery-label b,
+.forensic-discovery-label small {
+  display: block;
+  font-family: var(--mono);
+}
+
+.forensic-witness-zone b,
+.forensic-camera-state b,
+.forensic-outage-state b,
+.forensic-discovery-label b {
+  color: var(--green-soft);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+}
+
+.forensic-witness-zone small,
+.forensic-camera-state small,
+.forensic-outage-state small,
+.forensic-discovery-label small {
+  color: var(--muted);
+  font-size: 0.47rem;
+  letter-spacing: 0.06em;
+  margin-top: 5px;
+}
+
+.forensic-field--camera-corruption::after {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(124, 255, 169, 0.035) 0 2px,
+      transparent 2px 8px
+    );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.forensic-camera-state {
+  z-index: 1;
+}
+
+.forensic-field--grid-outage {
+  background: #010302;
+}
+
+.forensic-field--grid-outage .forensic-grid {
+  opacity: 0.1;
+}
+
+.forensic-outage-state b {
+  color: #b6c2bb;
+}
+
+.forensic-discovery-label {
+  left: 52%;
+  position: absolute;
+  top: 44%;
+}
+
+.forensic-field--body-discovered .forensic-grid {
+  opacity: 0.72;
+}
+
 .forensic-time {
   bottom: 14px;
   color: rgba(141, 184, 160, 0.55);
@@ -1016,6 +1146,17 @@ input:focus-visible {
   font-style: normal;
 }
 
+.case-timeline__scrubber {
+  display: block;
+  padding: 7px 0 14px;
+}
+
+.case-timeline__scrubber input {
+  accent-color: var(--green);
+  cursor: pointer;
+  width: 100%;
+}
+
 .case-timeline ol {
   list-style: none;
   margin: 0;
@@ -1023,16 +1164,31 @@ input:focus-visible {
 }
 
 .case-timeline li {
-  display: grid;
-  gap: 18px;
-  grid-template-columns: 92px 1fr;
   min-height: 74px;
-  padding: 14px 0;
   position: relative;
 }
 
 .case-timeline li + li {
   border-top: 1px solid var(--line);
+}
+
+.case-timeline li button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 92px 1fr;
+  min-height: 74px;
+  padding: 14px 4px;
+  text-align: left;
+  width: 100%;
+}
+
+.case-timeline__event--active button {
+  background: linear-gradient(90deg, rgba(98, 255, 159, 0.055), transparent 72%);
+  box-shadow: inset 2px 0 0 rgba(98, 255, 159, 0.55);
 }
 
 .case-timeline time {
@@ -1041,7 +1197,7 @@ input:focus-visible {
   letter-spacing: 0.05em;
 }
 
-.case-timeline li > span {
+.case-timeline li button > span {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1063,6 +1219,13 @@ input:focus-visible {
   font-size: 0.7rem;
   line-height: 1.55;
   margin: 2px 0 0;
+}
+
+.case-timeline__empty {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  margin: 18px 0 0;
 }
 
 .case-hint {
@@ -3204,7 +3367,7 @@ button.archive-record:hover,
     gap: 7px;
   }
 
-  .case-timeline li {
+  .case-timeline li button {
     gap: 8px;
     grid-template-columns: 1fr;
   }
