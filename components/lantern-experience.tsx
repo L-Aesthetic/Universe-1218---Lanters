@@ -543,9 +543,9 @@ function LanternScreen({
             `Waveform correlation with current scene: ${WAVEFORM_MATCH_PERCENT}%.`,
             "Incident location is not Earth.",
             "Guardian seal was applied after the field report was filed.",
-            "The final 88% of this record remains inaccessible.",
+            "Most of this record remains inaccessible at the current clearance.",
           ],
-          access: "UNSEALED 12%",
+          access: "PARTIAL UNSEAL",
           origin: ORIGINS.u1218Original,
         }
       : (() => {
@@ -994,7 +994,7 @@ function LanternScreen({
                         Lantern entered Corps service.
                       </p>
                     </div>
-                    <i>UNSEALED 12%</i>
+                    <i>PARTIAL UNSEAL</i>
                   </button>
                 </div>
 
