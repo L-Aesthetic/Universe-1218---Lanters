@@ -1135,18 +1135,25 @@ input:focus-visible {
 
 .power-ring__band {
   background:
-    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px),
-    radial-gradient(circle at 68% 72%, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px),
-    linear-gradient(150deg, #393934, #151714 48%, #050706);
+    radial-gradient(circle at 28% 18%, rgba(255, 244, 210, 0.13) 0 1px, transparent 1px),
+    radial-gradient(circle at 68% 72%, rgba(61, 35, 10, 0.08) 0 1px, transparent 1px),
+    linear-gradient(
+      150deg,
+      #e1c07a 0%,
+      var(--ring-gold-hi) 18%,
+      var(--ring-gold) 52%,
+      #765022 82%,
+      #3f2913 100%
+    );
   background-size:
     11px 11px,
     15px 15px,
     auto;
-  border: 1px solid rgba(216, 179, 107, 0.16);
+  border: 1px solid rgba(255, 232, 180, 0.2);
   border-radius: 44% 44% 48% 48%;
   box-shadow:
-    inset 9px 0 18px rgba(255, 255, 255, 0.025),
-    inset -10px -10px 20px rgba(0, 0, 0, 0.62),
+    inset 9px 0 18px rgba(255, 246, 216, 0.09),
+    inset -10px -10px 20px rgba(62, 34, 9, 0.46),
     0 9px 18px rgba(0, 0, 0, 0.5);
   height: 76%;
   left: 18%;
