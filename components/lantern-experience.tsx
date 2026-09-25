@@ -461,7 +461,9 @@ function SelectionScreen({
             SECTOR <b>2814</b>
           </span>
         </div>
-        <div className="selection-observation">{observation.persistence}</div>
+        <div className="selection-observation">
+          {observation.method} {observation.persistence}
+        </div>
         <h2 data-phase-heading tabIndex={-1}>Human of Earth.</h2>
         <p>You have the ability to overcome great fear.</p>
         <div className="selection-verdict">SELECTION CRITERIA SATISFIED</div>
