@@ -573,6 +573,13 @@ function SelectionScreen({
             SECTOR <b>2814</b>
           </span>
         </div>
+        <div className="selection-basis">
+          <small>SELECTION BASIS // IN-CASE ACTIONS ONLY</small>
+          <span>
+            No personal profile, device behavior, or activity outside this
+            investigation is analyzed.
+          </span>
+        </div>
         <div className="selection-observation">
           {observation.method} {observation.persistence}
         </div>
