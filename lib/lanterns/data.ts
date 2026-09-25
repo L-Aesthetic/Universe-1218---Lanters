@@ -1,10 +1,12 @@
 import type {
+  CaseTimelineEvent,
   ConstructKind,
   Evidence,
   EvidenceId,
   Phase,
 } from "./types";
 import { ORIGINS } from "./canon";
+import { addMillisecondsToClock } from "./time";
 
 export const STORAGE_KEY = "u1218-lantern-state-v1";
 export const PLACEHOLDER_SERIAL = "2814-00000000";
@@ -29,6 +31,65 @@ export const VALID_CONSTRUCTS: ConstructKind[] = [
   "beacon",
 ];
 
+
+const EMISSION_TIME = "02:13:41.811";
+
+export const CASE_CLOCK = {
+  emission: EMISSION_TIME,
+  witnessFlash: "≈02:14",
+  cameraCorruption: "≈02:14",
+  gridOutage: "02:17",
+  bodyDiscovered: addMillisecondsToClock(EMISSION_TIME, 4 * 60 * 1000),
+} as const;
+
+export const caseTimeline: CaseTimelineEvent[] = [
+  {
+    id: "emission",
+    time: CASE_CLOCK.emission,
+    label: "ANOMALOUS EMISSION",
+    detail: "Ring telemetry records a 0.81 second event north of the later body position.",
+    source: "RING TELEMETRY",
+    certainty: "exact",
+    evidenceId: "scene",
+  },
+  {
+    id: "witness-flash",
+    time: CASE_CLOCK.witnessFlash,
+    label: "GREEN-WHITE FLASH REPORTED",
+    detail: "Witness timing is approximate and independently overlaps the first camera metadata corruption.",
+    source: "WITNESS",
+    certainty: "approximate",
+    evidenceId: "witness",
+  },
+  {
+    id: "camera-corruption",
+    time: CASE_CLOCK.cameraCorruption,
+    label: "CAMERA METADATA CORRUPTION",
+    detail: "Street camera metadata begins corrupting before the municipal incident log starts.",
+    source: "MUNICIPAL",
+    certainty: "approximate",
+    evidenceId: "witness",
+  },
+  {
+    id: "grid-outage",
+    time: CASE_CLOCK.gridOutage,
+    label: "POWER OUTAGE LOGGED",
+    detail: "The local incident sequence begins with the municipal grid failure.",
+    source: "MUNICIPAL",
+    certainty: "exact",
+    evidenceId: "witness",
+  },
+  {
+    id: "body-discovered",
+    time: CASE_CLOCK.bodyDiscovered,
+    label: "BODY DISCOVERED",
+    detail: "Discovery occurs exactly four minutes after the ring-recorded emission.",
+    source: "DISCOVERY",
+    certainty: "exact",
+    evidenceId: "scene",
+  },
+];
+
 export const evidence: Evidence[] = [
   {
     id: "scene",
@@ -36,15 +97,17 @@ export const evidence: Evidence[] = [
     label: "SCENE TELEMETRY",
     title: "Energy trace",
     summary:
-      "A 0.8 second emission was recorded four minutes before the body was discovered.",
+      `A 0.81 second emission was recorded at ${CASE_CLOCK.emission}, exactly four minutes before the body was discovered.`,
     detail: [
       "Origin: 11.7 meters north of the victim.",
+      `Emission time: ${CASE_CLOCK.emission}.`,
       "Duration: 0.81 seconds.",
+      `Body discovered: ${CASE_CLOCK.bodyDiscovered}.`,
       "Known Earth technology match: none.",
       "Known Green Lantern ring signature match: none.",
       "The trace ends without a corresponding departure vector.",
     ],
-    status: "verified",
+    status: "observed",
     origin: ORIGINS.u1218Original,
   },
   {
@@ -53,15 +116,15 @@ export const evidence: Evidence[] = [
     label: "WITNESS STATEMENT",
     title: "The light came first",
     summary:
-      "A nearby witness places the anomalous light before the documented power failure.",
+      "A witness and municipal camera metadata both place unexplained activity before the local incident log begins.",
     detail: [
-      "Witness reports a green-white flash at approximately 02:14.",
-      "Municipal grid records place the outage at 02:17.",
-      "Street camera metadata begins corrupting three minutes before the outage.",
+      `Witness reports a green-white flash at approximately ${CASE_CLOCK.witnessFlash.replace("≈", "")}.`,
+      `Street camera metadata begins corrupting at approximately ${CASE_CLOCK.cameraCorruption.replace("≈", "")}.`,
+      `The municipal incident log begins with the grid outage at ${CASE_CLOCK.gridOutage}.`,
       "The witness could not identify a vehicle, aircraft, or person entering the scene.",
-      "The sequence conflicts with the official incident timeline.",
+      "The local timeline is incomplete: two independent records show activity before the event local authorities treated as the beginning.",
     ],
-    status: "conflict",
+    status: "unresolved",
     origin: ORIGINS.u1218Original,
   },
   {

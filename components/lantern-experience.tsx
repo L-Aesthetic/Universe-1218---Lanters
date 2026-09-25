@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 
 import {
+  CASE_CLOCK,
   PLACEHOLDER_SERIAL,
+  caseTimeline,
   constructPrograms,
   evidence,
   sectorNodes,
@@ -250,6 +252,9 @@ function CaseScreen({
 }) {
   const active = evidence.find((item) => item.id === activeId) ?? evidence[0];
   const complete = reviewed.length === evidence.length;
+  const visibleTimeline = caseTimeline.filter((event) =>
+    reviewed.includes(event.evidenceId),
+  );
 
   return (
     <section className="screen screen--case">
@@ -291,10 +296,10 @@ function CaseScreen({
                 <RecordOriginBadge origin={active.origin} />
                 <Classification
                   value={
-                    active.status === "verified"
+                    active.status === "observed"
                       ? "MEASURED"
-                      : active.status === "conflict"
-                        ? "CONFLICT"
+                      : active.status === "unresolved"
+                        ? "UNRESOLVED"
                         : "PARTIAL RECORD"
                   }
                 />
@@ -317,7 +322,7 @@ function CaseScreen({
                   <b>UNKNOWN EMISSION</b>
                   <small>11.7 M</small>
                 </span>
-                <span className="forensic-time">02:17:43.811</span>
+                <span className="forensic-time">{CASE_CLOCK.emission}</span>
               </div>
               <figcaption className="sr-only">
                 Two-dimensional ring telemetry reconstruction of the Rushville
@@ -339,6 +344,31 @@ function CaseScreen({
                 ))}
               </ul>
             </div>
+
+            <section className="case-timeline" aria-label="revealed case timeline">
+              <div className="case-timeline__heading">
+                <span>
+                  <small>RECONSTRUCTED SEQUENCE</small>
+                  <b>Only reviewed records are shown.</b>
+                </span>
+                <i>{String(visibleTimeline.length).padStart(2, "0")} EVENTS</i>
+              </div>
+              <ol>
+                {visibleTimeline.map((event) => (
+                  <li key={event.id}>
+                    <time>{event.time}</time>
+                    <span>
+                      <small>
+                        {event.source}
+                        {event.certainty === "approximate" ? " // APPROX." : ""}
+                      </small>
+                      <b>{event.label}</b>
+                      <p>{event.detail}</p>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
 
             {complete ? (
               <button
@@ -839,7 +869,7 @@ function LanternScreen({
                 <div className="waveform-console__header">
                   <span>
                     <small>CURRENT TRACE</small>
-                    <b>2814-E/001 // 02:13:41.811</b>
+                    <b>2814-E/001 // {CASE_CLOCK.emission}</b>
                   </span>
                   <span>
                     <small>HISTORIC TRACE</small>

@@ -970,6 +970,101 @@ input:focus-visible {
   margin-right: 11px;
 }
 
+
+.case-timeline {
+  border-top: 1px solid var(--line);
+  margin-top: 30px;
+  padding-top: 18px;
+}
+
+.case-timeline__heading {
+  align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.case-timeline__heading > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.case-timeline__heading small,
+.case-timeline__heading b,
+.case-timeline__heading i,
+.case-timeline time,
+.case-timeline li small,
+.case-timeline li b {
+  font-family: var(--mono);
+}
+
+.case-timeline__heading small,
+.case-timeline__heading i {
+  color: var(--muted);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+}
+
+.case-timeline__heading b {
+  color: #a7b8ae;
+  font-size: 0.58rem;
+  font-weight: 500;
+}
+
+.case-timeline__heading i {
+  font-style: normal;
+}
+
+.case-timeline ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.case-timeline li {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 92px 1fr;
+  min-height: 74px;
+  padding: 14px 0;
+  position: relative;
+}
+
+.case-timeline li + li {
+  border-top: 1px solid var(--line);
+}
+
+.case-timeline time {
+  color: var(--green-soft);
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
+}
+
+.case-timeline li > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.case-timeline li small {
+  color: var(--muted);
+  font-size: 0.48rem;
+  letter-spacing: 0.07em;
+}
+
+.case-timeline li b {
+  color: #c0d0c6;
+  font-size: 0.64rem;
+}
+
+.case-timeline li p {
+  color: #7f9387;
+  font-size: 0.7rem;
+  line-height: 1.55;
+  margin: 2px 0 0;
+}
+
 .case-hint {
   border-top: 1px solid var(--line);
   color: var(--muted);
@@ -3100,6 +3195,18 @@ button.archive-record:hover,
 
   .evidence-card__state {
     display: none;
+  }
+
+
+  .case-timeline__heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .case-timeline li {
+    gap: 8px;
+    grid-template-columns: 1fr;
   }
 
   .forensic-field {

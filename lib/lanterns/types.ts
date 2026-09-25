@@ -11,7 +11,7 @@ export type Evidence = {
   title: string;
   summary: string;
   detail: string[];
-  status: "verified" | "conflict" | "restricted";
+  status: "observed" | "unresolved" | "restricted";
   origin: RecordOrigin;
 };
 
@@ -38,3 +38,13 @@ export type RingSystem =
 export type ConstructKind = "shield" | "bridge" | "beacon";
 export type ArchiveRecordId = EvidenceId | "prior";
 export type SectorNodeId = "sol" | "oa" | "relay" | "dark";
+
+export type CaseTimelineEvent = {
+  id: string;
+  time: string;
+  label: string;
+  detail: string;
+  source: "RING TELEMETRY" | "WITNESS" | "MUNICIPAL" | "DISCOVERY";
+  certainty: "exact" | "approximate";
+  evidenceId: EvidenceId;
+};

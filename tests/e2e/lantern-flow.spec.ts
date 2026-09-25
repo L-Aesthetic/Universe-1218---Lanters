@@ -95,3 +95,24 @@ test("selection remains operable on a short viewport", async ({ page }) => {
     page.viewportSize()?.height ?? 640,
   );
 });
+
+
+test("case reconstruction reveals only reviewed timeline evidence", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /establish archive link/i }).click();
+  await page.getByRole("button", { name: /open incident/i }).click();
+
+  await page.getByRole("button", { name: /energy trace/i }).click();
+
+  await expect(page.getByText("02:13:41.811").first()).toBeVisible();
+  await expect(page.getByText("02:17:41.811").first()).toBeVisible();
+  await expect(page.getByText(/power outage logged/i)).toHaveCount(0);
+
+  await page.getByRole("button", { name: /the light came first/i }).click();
+
+  await expect(page.getByText(/power outage logged/i)).toBeVisible();
+  await expect(
+    page.getByText("CAMERA METADATA CORRUPTION", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText(/local timeline is incomplete/i)).toBeVisible();
+});
