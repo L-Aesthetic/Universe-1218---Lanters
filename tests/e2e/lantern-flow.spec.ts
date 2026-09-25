@@ -229,7 +229,9 @@ test("Corps network never fabricates shared activity while local-only", async ({
   await expect(
     page.getByRole("heading", { name: /local ring only/i }),
   ).toBeVisible();
-  await expect(page.getByText("LOCAL ONLY", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(/network state.*local only/i),
+  ).toBeVisible();
   await expect(
     page.getByText(/no shared corps network is bound/i),
   ).toBeVisible();
