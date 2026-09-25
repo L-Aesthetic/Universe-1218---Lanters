@@ -33,7 +33,8 @@ export type RingSystem =
   | "case"
   | "archive"
   | "sector"
-  | "construct";
+  | "construct"
+  | "ask";
 
 export type ConstructKind = "shield" | "bridge" | "beacon";
 export type ArchiveRecordId = EvidenceId | "prior";
