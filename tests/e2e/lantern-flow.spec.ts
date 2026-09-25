@@ -216,3 +216,27 @@ test("assignments advance from case review to correlation to sector trace", asyn
   await expect(page.getByText("TRACE THE RETURN", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("AVAILABLE", { exact: true }).first()).toBeVisible();
 });
+
+
+test("Corps network never fabricates shared activity while local-only", async ({
+  page,
+}) => {
+  await reachSelection(page);
+  await page.getByRole("button", { name: /put on the ring/i }).click();
+
+  await page.getByRole("button", { name: "CORPS", exact: true }).click();
+
+  await expect(
+    page.getByRole("heading", { name: /local ring only/i }),
+  ).toBeVisible();
+  await expect(page.getByText("LOCAL ONLY", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(/no shared corps network is bound/i),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /request lantern assistance/i }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText(/no global event is fabricated/i),
+  ).toBeVisible();
+});
