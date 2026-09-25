@@ -216,3 +216,42 @@ test("assignments advance from case review to correlation to sector trace", asyn
   await expect(page.getByText("TRACE THE RETURN", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("AVAILABLE", { exact: true }).first()).toBeVisible();
 });
+
+
+test("construct training uses the interactive 3D renderer", async ({ page }) => {
+  await reachSelection(page);
+  await page.getByRole("button", { name: /put on the ring/i }).click();
+
+  await page.getByRole("button", { name: /construct/i }).click();
+
+  const canvas = page.getByRole("application", {
+    name: /interactive three-dimensional defensive shield construct/i,
+  });
+
+  await expect(canvas).toBeVisible();
+  await expect(canvas).toHaveAttribute("data-renderer", /webgl|fallback/);
+
+  await canvas.focus();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("+");
+
+  await page
+    .getByRole("button", { name: /load-bearing bridge/i })
+    .click();
+
+  await expect(
+    page.getByRole("application", {
+      name: /interactive three-dimensional load-bearing bridge/i,
+    }),
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", { name: /distress beacon/i })
+    .click();
+
+  await expect(
+    page.getByRole("application", {
+      name: /interactive three-dimensional distress beacon/i,
+    }),
+  ).toBeVisible();
+});
