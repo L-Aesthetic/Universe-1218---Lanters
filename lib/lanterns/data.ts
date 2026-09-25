@@ -6,6 +6,7 @@ import type {
   Phase,
 } from "./types";
 import { ORIGINS } from "./canon";
+import { addMillisecondsToClock } from "./time";
 
 export const STORAGE_KEY = "u1218-lantern-state-v1";
 export const PLACEHOLDER_SERIAL = "2814-00000000";
@@ -31,12 +32,14 @@ export const VALID_CONSTRUCTS: ConstructKind[] = [
 ];
 
 
+const EMISSION_TIME = "02:13:41.811";
+
 export const CASE_CLOCK = {
-  emission: "02:13:41.811",
+  emission: EMISSION_TIME,
   witnessFlash: "≈02:14",
   cameraCorruption: "≈02:14",
   gridOutage: "02:17",
-  bodyDiscovered: "02:17:41.811",
+  bodyDiscovered: addMillisecondsToClock(EMISSION_TIME, 4 * 60 * 1000),
 } as const;
 
 export const caseTimeline: CaseTimelineEvent[] = [
