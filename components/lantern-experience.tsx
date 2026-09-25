@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { ConstructViewport } from "./construct-viewport";
+
 import {
   CASE_CLOCK,
   PLACEHOLDER_SERIAL,
@@ -1504,13 +1506,12 @@ function LanternScreen({
               </div>
 
               <div className="construct-layout">
-                <div className="construct-stage" key={constructPulse + construct}>
-                  <div className={`construct construct--${construct}`} aria-hidden="true">
-                    <span className="construct-part construct-part--one" />
-                    <span className="construct-part construct-part--two" />
-                    <span className="construct-part construct-part--three" />
-                    <span className="construct-part construct-part--four" />
-                  </div>
+                <div className="construct-stage">
+                  <ConstructViewport
+                    kind={construct}
+                    buildPulse={constructPulse}
+                    label={constructPrograms[construct].name}
+                  />
                   <div className="construct-readout">
                     <span>
                       <small>PROGRAM</small>
