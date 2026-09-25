@@ -224,7 +224,7 @@ test("construct training uses the interactive 3D renderer", async ({ page }) => 
 
   await page.getByRole("button", { name: /construct/i }).click();
 
-  const canvas = page.getByRole("img", {
+  const canvas = page.getByRole("application", {
     name: /interactive three-dimensional defensive shield construct/i,
   });
 
@@ -240,7 +240,7 @@ test("construct training uses the interactive 3D renderer", async ({ page }) => 
     .click();
 
   await expect(
-    page.getByRole("img", {
+    page.getByRole("application", {
       name: /interactive three-dimensional load-bearing bridge/i,
     }),
   ).toBeVisible();
@@ -250,7 +250,7 @@ test("construct training uses the interactive 3D renderer", async ({ page }) => 
     .click();
 
   await expect(
-    page.getByRole("img", {
+    page.getByRole("application", {
       name: /interactive three-dimensional distress beacon/i,
     }),
   ).toBeVisible();
