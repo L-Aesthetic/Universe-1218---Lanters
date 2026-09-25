@@ -242,3 +242,52 @@ test("Corps network never fabricates shared activity while local-only", async ({
     page.getByText(/no global event is fabricated/i),
   ).toBeVisible();
 });
+
+
+test("construct training uses the interactive 3D renderer", async ({ page }) => {
+  await reachSelection(page);
+  await page.getByRole("button", { name: /put on the ring/i }).click();
+
+  await page.getByRole("button", { name: /construct/i }).click();
+
+  const viewport = page
+    .locator(".construct-viewport")
+    .filter({ has: page.locator("canvas") });
+  const canvas = viewport.locator("canvas");
+
+  await expect(viewport).toBeVisible();
+  await expect(viewport).toHaveAttribute(
+    "aria-label",
+    /interactive three-dimensional defensive shield/i,
+  );
+  await expect(canvas).toHaveAttribute("data-renderer", /webgl|fallback/);
+
+  await canvas.focus();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("+");
+
+  await page
+    .getByRole("button", { name: /load-bearing bridge/i })
+    .click();
+
+  await expect(viewport).toHaveAttribute(
+    "aria-label",
+    /interactive three-dimensional load-bearing bridge/i,
+  );
+
+  await page
+    .getByRole("button", { name: /distress beacon/i })
+    .click();
+
+  await expect(viewport).toHaveAttribute(
+    "aria-label",
+    /interactive three-dimensional distress beacon/i,
+  );
+
+  const results = await new AxeBuilder({ page }).analyze();
+  const blocking = results.violations.filter((violation) =>
+    ["serious", "critical"].includes(violation.impact ?? ""),
+  );
+
+  expect(blocking).toEqual([]);
+});
