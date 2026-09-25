@@ -187,6 +187,7 @@ export function ConstructViewport({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [unavailable, setUnavailable] = useState(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -373,6 +374,7 @@ export function ConstructViewport({
       gl.deleteProgram(program);
     };
   }, [buildPulse, kind]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return (
     <div className="construct-viewport">
