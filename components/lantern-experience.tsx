@@ -4,9 +4,6 @@ import { useEffect, useState } from "react";
 
 import {
   PLACEHOLDER_SERIAL,
-  VALID_CONSTRUCTS,
-  VALID_EVIDENCE_IDS,
-  VALID_PHASES,
   constructPrograms,
   evidence,
   sectorNodes,
@@ -17,6 +14,12 @@ import {
   deriveCaseIntelligence,
   deriveSelectionObservation,
 } from "../lib/lanterns/intelligence";
+import {
+  CURRENT_TRACE,
+  HISTORIC_TRACE,
+  WAVEFORM_MATCH_PERCENT,
+  toWaveformPoints,
+} from "../lib/lanterns/waveform";
 import {
   clearPersistedState,
   loadPersistedState,
@@ -33,24 +36,6 @@ import type {
   SectorNodeId,
 } from "../lib/lanterns/types";
 import type { RecordOrigin } from "../lib/lanterns/canon";
-
-function isPhase(value: unknown): value is Phase {
-  return typeof value === "string" && VALID_PHASES.includes(value as Phase);
-}
-
-function isEvidenceId(value: unknown): value is EvidenceId {
-  return (
-    typeof value === "string" &&
-    VALID_EVIDENCE_IDS.includes(value as EvidenceId)
-  );
-}
-
-function isConstructKind(value: unknown): value is ConstructKind {
-  return (
-    typeof value === "string" &&
-    VALID_CONSTRUCTS.includes(value as ConstructKind)
-  );
-}
 
 function LanternMark({ compact = false }: { compact?: boolean }) {
   return (
@@ -243,7 +228,7 @@ function ArchiveScreen({ onOpen }: { onOpen: () => void }) {
         </main>
 
         <footer className="archive-footer">
-          <span>ARCHIVE LATENCY 18MS</span>
+          <span>ARCHIVE LINK // LOCAL SESSION</span>
           <span>U1218 ADAPTATION // FAN CONTINUITY</span>
           <span>EARTH RELAY 04 ONLINE</span>
         </footer>
@@ -455,7 +440,9 @@ function SelectionScreen({
             SECTOR <b>2814</b>
           </span>
         </div>
-        <div className="selection-observation">{observation.persistence}</div>
+        <div className="selection-observation">
+          {observation.method} {observation.persistence}
+        </div>
         <h2 data-phase-heading tabIndex={-1}>Human of Earth.</h2>
         <p>You have the ability to overcome great fear.</p>
         <div className="selection-verdict">SELECTION CRITERIA SATISFIED</div>
@@ -534,12 +521,12 @@ function LanternScreen({
             "The same waveform was logged before either current Earth Lantern entered Corps service.",
           detail: [
             "Original Lantern assignment remains sealed.",
-            "Waveform correlation with current scene: 91.4%.",
+            `Waveform correlation with current scene: ${WAVEFORM_MATCH_PERCENT}%.`,
             "Incident location is not Earth.",
             "Guardian seal was applied after the field report was filed.",
-            "The final 88% of this record remains inaccessible.",
+            "Most of this record remains inaccessible at the current clearance.",
           ],
-          access: "UNSEALED 12%",
+          access: "PARTIAL UNSEAL",
           origin: ORIGINS.u1218Original,
         }
       : (() => {
@@ -562,6 +549,23 @@ function LanternScreen({
     correlated,
     contactScanned,
   });
+
+  const serviceEvents = [
+    correlated
+      ? {
+          action: "WAVEFORM CORRELATION",
+          result: `${WAVEFORM_MATCH_PERCENT}% MATCH // OFF-WORLD ORIGIN`,
+        }
+      : null,
+    contactScanned
+      ? {
+          action: "REMOTE CONTACT SCAN",
+          result: "ONE SIGNATURE // THREE ORIGINS",
+        }
+      : null,
+  ].filter(
+    (event): event is { action: string; result: string } => event !== null,
+  );
 
   const feedback = (kind: "soft" | "confirm" | "alert") =>
     ringFeedback(kind, { sound: soundEnabled });
@@ -734,38 +738,26 @@ function LanternScreen({
                         <span><small>ASSIGNMENTS</small><b>01</b></span>
                         <span><small>CONSTRUCTS</small><b>{String(constructsBuilt.length).padStart(2, "0")}</b></span>
                       </div>
-                      {correlated ? (
+                      {serviceEvents.length > 0 ? (
                         <div className="service-log">
                           <div className="eyebrow">SERVICE LOG // FIELD RECORD</div>
-                          <div>
-                            <span>
-                              <small>CASE</small>
-                              <b>2814-E/001</b>
-                            </span>
-                            <span>
-                              <small>ACTION</small>
-                              <b>WAVEFORM CORRELATION</b>
-                            </span>
-                            <span>
-                              <small>RESULT</small>
-                              <b>91.4% MATCH // OFF-WORLD ORIGIN</b>
-                            </span>
-                            {contactScanned ? (
-                              <>
+                          <div className="service-events">
+                            {serviceEvents.map((event) => (
+                              <div className="service-event" key={event.action}>
                                 <span>
                                   <small>CASE</small>
-                                  <b>2814-E/001</b>
+                                  <b>{CASE_META.id}</b>
                                 </span>
                                 <span>
                                   <small>ACTION</small>
-                                  <b>REMOTE CONTACT SCAN</b>
+                                  <b>{event.action}</b>
                                 </span>
                                 <span>
                                   <small>RESULT</small>
-                                  <b>MULTIPLE ORIGINS // SINGLE SIGNATURE</b>
+                                  <b>{event.result}</b>
                                 </span>
-                              </>
-                            ) : null}
+                              </div>
+                            ))}
                           </div>
                         </div>
                       ) : null}
@@ -794,7 +786,7 @@ function LanternScreen({
                   <dl>
                     <div><dt>OBJECTIVE</dt><dd>{caseIntel.objective}</dd></div>
                     <div><dt>CASE STAGE</dt><dd>{caseIntel.stage.toUpperCase()}</dd></div>
-                    <div><dt>RING STATUS</dt><dd>99.7% charge.</dd></div>
+                    <div><dt>RING STATUS</dt><dd>NOMINAL</dd></div>
                   </dl>
                   <div className="finding-strip" aria-label="current case findings">
                     {caseIntel.findings.slice(-3).map((finding) => (
@@ -856,25 +848,38 @@ function LanternScreen({
                 </div>
                 <figure className="waveform-figure">
                   <div className="waveform-plot" aria-hidden="true">
-                    <span className="waveform waveform--current" />
-                    <span className="waveform waveform--historic" />
-                    <i className="waveform-marker waveform-marker--a" />
-                    <i className="waveform-marker waveform-marker--b" />
-                    <i className="waveform-marker waveform-marker--c" />
+                    <svg
+                      className="waveform-svg"
+                      viewBox="0 0 100 100"
+                      preserveAspectRatio="none"
+                    >
+                      <polyline
+                        className="waveform-line waveform-line--current"
+                        points={toWaveformPoints(CURRENT_TRACE)}
+                      />
+                      <polyline
+                        className="waveform-line waveform-line--historic"
+                        points={toWaveformPoints(HISTORIC_TRACE)}
+                      />
+                    </svg>
                   </div>
                   <figcaption className="sr-only">
-                    Waveform comparison between the current Rushville trace and
-                    sealed record 2814 delta 19. A completed analysis shows a
-                    91.4 percent harmonic correlation.
+                    {correlated
+                      ? `Waveform comparison between the current Rushville trace and sealed record 2814 delta 19. The stored samples produce a ${WAVEFORM_MATCH_PERCENT} percent Pearson correlation.`
+                      : "Two stored waveform traces are available. The ring has not run a correlation analysis yet."}
                   </figcaption>
                 </figure>
                 <div className="waveform-console__result">
                   {correlated ? (
                     <>
-                      <span><small>CORRELATION</small><b>91.4%</b></span>
+                      <span>
+                        <small>CORRELATION</small>
+                        <b>{WAVEFORM_MATCH_PERCENT}%</b>
+                      </span>
                       <p>
-                        The two emissions share a non-random harmonic structure.
-                        The historic event did not occur on Earth.
+                        The stored trace shapes correlate strongly across the
+                        sample window. The historic record places the earlier
+                        event off-world.
                       </p>
                     </>
                   ) : (
@@ -892,7 +897,7 @@ function LanternScreen({
                   onClick={() => {
                     onCorrelate();
                     setAnnouncement(
-                      "Waveform correlation complete. Match: 91.4 percent. Historical origin is off-world.",
+                      `Waveform correlation complete. Match: ${WAVEFORM_MATCH_PERCENT} percent. Historical origin is off-world.`,
                     );
                     feedback("confirm");
                   }}
@@ -970,7 +975,7 @@ function LanternScreen({
                         Lantern entered Corps service.
                       </p>
                     </div>
-                    <i>UNSEALED 12%</i>
+                    <i>PARTIAL UNSEAL</i>
                   </button>
                 </div>
 
@@ -1073,7 +1078,10 @@ function LanternScreen({
                           <div className="sector-scan-result">
                             <span><small>CONTACT TYPE</small><b>SPATIAL ECHO</b></span>
                             <span><small>ORIGINS</small><b>03</b></span>
-                            <span><small>SIGNATURE</small><b>91.4% MATCH</b></span>
+                            <span>
+                              <small>SIGNATURE</small>
+                              <b>{WAVEFORM_MATCH_PERCENT}% MATCH</b>
+                            </span>
                           </div>
                         ) : null}
                       </>
@@ -1118,9 +1126,18 @@ function LanternScreen({
                     <span className="construct-part construct-part--four" />
                   </div>
                   <div className="construct-readout">
-                    <span><small>PROGRAM</small><b>{constructPrograms[construct].name}</b></span>
-                    <span><small>STABILITY</small><b>{construct === "bridge" ? "84.2%" : "98.6%"}</b></span>
-                    <span><small>DRAW</small><b>{construct === "beacon" ? "LOW" : "NOMINAL"}</b></span>
+                    <span>
+                      <small>PROGRAM</small>
+                      <b>{constructPrograms[construct].name}</b>
+                    </span>
+                    <span>
+                      <small>STRUCTURE</small>
+                      <b>{constructPrograms[construct].structure}</b>
+                    </span>
+                    <span>
+                      <small>CLASS</small>
+                      <b>{constructPrograms[construct].trainingClass}</b>
+                    </span>
                   </div>
                 </div>
 
@@ -1176,36 +1193,68 @@ function LanternScreen({
         <nav className="ring-dock" aria-label="Lantern systems">
           <button
             type="button"
-            className={`ring-dock__item ${system === "case" ? "ring-dock__item--active" : ""}`}
+            className={[
+              "ring-dock__item",
+              system === "case" ? "ring-dock__item--active" : "",
+              caseIntel.recommendedSystem === "case" && system !== "case"
+                ? "ring-dock__item--recommended"
+                : "",
+            ].filter(Boolean).join(" ")}
+            aria-current={system === "case" ? "page" : undefined}
             onClick={() => openSystem("case")}
           >
             <i>01</i><b>CASE</b>
+            {caseIntel.recommendedSystem === "case" && system !== "case" ? (
+              <small>NEXT</small>
+            ) : null}
           </button>
           <button
             type="button"
-            className={`ring-dock__item ${system === "archive" ? "ring-dock__item--active" : ""}`}
+            className={[
+              "ring-dock__item",
+              system === "archive" ? "ring-dock__item--active" : "",
+              caseIntel.recommendedSystem === "archive" && system !== "archive"
+                ? "ring-dock__item--recommended"
+                : "",
+            ].filter(Boolean).join(" ")}
+            aria-current={system === "archive" ? "page" : undefined}
             onClick={() => openSystem("archive")}
           >
             <i>02</i><b>ARCHIVE</b>
+            {caseIntel.recommendedSystem === "archive" && system !== "archive" ? (
+              <small>NEXT</small>
+            ) : null}
           </button>
           <button
             type="button"
             className={`ring-dock__core ${system === "record" ? "ring-dock__core--active" : ""}`}
             onClick={() => openSystem("record")}
+            aria-current={system === "record" ? "page" : undefined}
             aria-label="Open Lantern service record"
           >
             <LanternMark compact />
           </button>
           <button
             type="button"
-            className={`ring-dock__item ${system === "sector" ? "ring-dock__item--active" : ""}`}
+            className={[
+              "ring-dock__item",
+              system === "sector" ? "ring-dock__item--active" : "",
+              caseIntel.recommendedSystem === "sector" && system !== "sector"
+                ? "ring-dock__item--recommended"
+                : "",
+            ].filter(Boolean).join(" ")}
+            aria-current={system === "sector" ? "page" : undefined}
             onClick={() => openSystem("sector")}
           >
             <i>03</i><b>SECTOR</b>
+            {caseIntel.recommendedSystem === "sector" && system !== "sector" ? (
+              <small>NEXT</small>
+            ) : null}
           </button>
           <button
             type="button"
             className={`ring-dock__item ${system === "construct" ? "ring-dock__item--active" : ""}`}
+            aria-current={system === "construct" ? "page" : undefined}
             onClick={() => openSystem("construct")}
           >
             <i>04</i><b>CONSTRUCT</b>
@@ -1244,54 +1293,31 @@ export function LanternExperience() {
     const parsed = loadPersistedState();
 
     if (parsed) {
-      const persistedPhase = isPhase(parsed.phase) ? parsed.phase : "boot";
-      const persistedContactScanned = parsed.contactScanned === true;
-      const persistedCorrelated =
-        parsed.correlated === true || persistedContactScanned;
-      const persistedReviewed = Array.isArray(parsed.reviewed)
-        ? Array.from(new Set(parsed.reviewed.filter(isEvidenceId)))
-        : [];
+      const persistedPhase = parsed.phase ?? "boot";
+      const persistedReviewed = parsed.reviewed ?? [];
 
       setPhase(persistedPhase);
       setReviewed(persistedReviewed);
+      setActiveId(parsed.activeEvidenceId ?? "scene");
+      setLanternName(parsed.lanternName ?? "");
 
-      if (isEvidenceId(parsed.activeEvidenceId)) {
-        setActiveId(parsed.activeEvidenceId);
-      } else if (persistedReviewed.length > 0) {
-        setActiveId(persistedReviewed[persistedReviewed.length - 1]);
-      }
-
-      if (typeof parsed.lanternName === "string") {
-        setLanternName(parsed.lanternName.slice(0, 64));
-      }
-
-      if (
-        typeof parsed.ringSerial === "string" &&
-        /^2814-\d{8}$/.test(parsed.ringSerial)
-      ) {
+      if (parsed.ringSerial) {
         setRingSerial(parsed.ringSerial);
       } else if (persistedPhase === "lantern") {
         setRingSerial(createRingSerial());
       }
 
-      setCorrelated(persistedCorrelated);
-      setContactScanned(persistedContactScanned);
+      setCorrelated(parsed.correlated === true);
+      setContactScanned(parsed.contactScanned === true);
       setSoundEnabled(parsed.soundEnabled !== false);
 
-      if (
-        typeof parsed.selectedAt === "string" &&
-        !Number.isNaN(Date.parse(parsed.selectedAt))
-      ) {
+      if (parsed.selectedAt) {
         setSelectedAt(parsed.selectedAt);
       } else if (persistedPhase === "lantern") {
         setSelectedAt(new Date().toISOString());
       }
 
-      if (Array.isArray(parsed.constructsBuilt)) {
-        setConstructsBuilt(
-          Array.from(new Set(parsed.constructsBuilt.filter(isConstructKind))),
-        );
-      }
+      setConstructsBuilt(parsed.constructsBuilt ?? []);
     }
 
     setHydrated(true);

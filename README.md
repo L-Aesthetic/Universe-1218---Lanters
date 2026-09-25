@@ -42,7 +42,7 @@ Mission findings, ring identity, selection date, active evidence, sound preferen
 - No account wall before the fiction begins.
 - Selection responds to actions inside the investigation, not a personality quiz or hidden psychological score.
 - Observation, interpretation, and lore provenance are separate concepts.
-- Green is energy/system activity; the physical current-series-inspired ring uses dark metal, gold-tone face material, and green enamel rather than being painted neon green.
+- Green is energy/system activity; the physical current-series-inspired ring uses gold-plated metal and green enamel rather than being painted neon green.
 - Case findings change later objectives and service history.
 - Controls must do something real.
 - No XP system or arbitrary grind.
