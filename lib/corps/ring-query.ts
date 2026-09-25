@@ -62,7 +62,7 @@ function scoreRecord(record: RingKnowledgeRecord, query: string) {
 
   for (const token of queryTokens) {
     if (title.includes(token)) score += 4;
-    if (tags.some((tag) => tag.includes(token))) score += 3;
+    if (tags.some((tag) => tag.includes(token))) score += 4;
     if (body.includes(token)) score += 1;
   }
 
