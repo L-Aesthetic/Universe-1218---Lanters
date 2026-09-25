@@ -166,3 +166,53 @@ test("ring reconstruction scrubs only through revealed events", async ({ page })
   await expect(page.getByText(/municipal grid loss/i)).toBeVisible();
   await expect(page.getByText(/body position recorded/i)).toHaveCount(0);
 });
+
+
+test("Ask the Ring stays grounded and cites its answer", async ({ page }) => {
+  await reachSelection(page);
+  await page.getByRole("button", { name: /put on the ring/i }).click();
+
+  await page.getByRole("button", { name: /ask ring/i }).click();
+  await expect(
+    page.getByRole("heading", { name: /ask the ring/i }),
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", { name: /why was the prior record sealed/i })
+    .click();
+
+  await expect(page.getByText("KNOWN", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(/does not state the motive.*will not invent one/i),
+  ).toBeVisible();
+  await expect(page.getByText(/case 2814-e\/001.*oan record/i)).toBeVisible();
+
+  const input = page.getByLabel("QUERY");
+  await input.fill("What did Abin Sur eat for breakfast?");
+  await page.getByRole("button", { name: "ASK", exact: true }).click();
+
+  await expect(page.getByText("UNKNOWN", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(/does not contain enough grounded information/i),
+  ).toBeVisible();
+});
+
+test("assignments advance from case review to correlation to sector trace", async ({
+  page,
+}) => {
+  await reachSelection(page);
+  await page.getByRole("button", { name: /put on the ring/i }).click();
+
+  await expect(page.getByText("COMPARE PRIOR CONTACT", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("AVAILABLE", { exact: true }).first()).toBeVisible();
+
+  await page.getByRole("button", { name: /open case/i }).click();
+  await page
+    .getByRole("button", { name: /run waveform correlation/i })
+    .click();
+
+  await page.getByRole("button", { name: /open lantern service record/i }).click();
+
+  await expect(page.getByText("TRACE THE RETURN", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("AVAILABLE", { exact: true }).first()).toBeVisible();
+});
