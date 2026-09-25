@@ -17,6 +17,7 @@ import {
   deriveCaseIntelligence,
   deriveSelectionObservation,
 } from "../lib/lanterns/intelligence";
+import { WAVEFORM_MATCH_PERCENT } from "../lib/lanterns/waveform";
 import {
   clearPersistedState,
   loadPersistedState,
@@ -243,7 +244,7 @@ function ArchiveScreen({ onOpen }: { onOpen: () => void }) {
         </main>
 
         <footer className="archive-footer">
-          <span>ARCHIVE LATENCY 18MS</span>
+          <span>ARCHIVE LINK // LOCAL SESSION</span>
           <span>U1218 ADAPTATION // FAN CONTINUITY</span>
           <span>EARTH RELAY 04 ONLINE</span>
         </footer>
@@ -534,7 +535,7 @@ function LanternScreen({
             "The same waveform was logged before either current Earth Lantern entered Corps service.",
           detail: [
             "Original Lantern assignment remains sealed.",
-            "Waveform correlation with current scene: 91.4%.",
+            `Waveform correlation with current scene: ${WAVEFORM_MATCH_PERCENT}%.`,
             "Incident location is not Earth.",
             "Guardian seal was applied after the field report was filed.",
             "The final 88% of this record remains inaccessible.",
@@ -567,7 +568,7 @@ function LanternScreen({
     correlated
       ? {
           action: "WAVEFORM CORRELATION",
-          result: "91.4% MATCH // OFF-WORLD ORIGIN",
+          result: `${WAVEFORM_MATCH_PERCENT}% MATCH // OFF-WORLD ORIGIN`,
         }
       : null,
     contactScanned
@@ -799,7 +800,7 @@ function LanternScreen({
                   <dl>
                     <div><dt>OBJECTIVE</dt><dd>{caseIntel.objective}</dd></div>
                     <div><dt>CASE STAGE</dt><dd>{caseIntel.stage.toUpperCase()}</dd></div>
-                    <div><dt>RING STATUS</dt><dd>99.7% charge.</dd></div>
+                    <div><dt>RING STATUS</dt><dd>NOMINAL</dd></div>
                   </dl>
                   <div className="finding-strip" aria-label="current case findings">
                     {caseIntel.findings.slice(-3).map((finding) => (
@@ -870,13 +871,17 @@ function LanternScreen({
                   <figcaption className="sr-only">
                     Waveform comparison between the current Rushville trace and
                     sealed record 2814 delta 19. A completed analysis shows a
-                    91.4 percent harmonic correlation.
+                    {WAVEFORM_MATCH_PERCENT} percent correlation across the stored
+                    samples.
                   </figcaption>
                 </figure>
                 <div className="waveform-console__result">
                   {correlated ? (
                     <>
-                      <span><small>CORRELATION</small><b>91.4%</b></span>
+                      <span>
+                        <small>CORRELATION</small>
+                        <b>{WAVEFORM_MATCH_PERCENT}%</b>
+                      </span>
                       <p>
                         The two emissions share a non-random harmonic structure.
                         The historic event did not occur on Earth.
@@ -897,7 +902,7 @@ function LanternScreen({
                   onClick={() => {
                     onCorrelate();
                     setAnnouncement(
-                      "Waveform correlation complete. Match: 91.4 percent. Historical origin is off-world.",
+                      `Waveform correlation complete. Match: ${WAVEFORM_MATCH_PERCENT} percent. Historical origin is off-world.`,
                     );
                     feedback("confirm");
                   }}
@@ -1078,7 +1083,10 @@ function LanternScreen({
                           <div className="sector-scan-result">
                             <span><small>CONTACT TYPE</small><b>SPATIAL ECHO</b></span>
                             <span><small>ORIGINS</small><b>03</b></span>
-                            <span><small>SIGNATURE</small><b>91.4% MATCH</b></span>
+                            <span>
+                              <small>SIGNATURE</small>
+                              <b>{WAVEFORM_MATCH_PERCENT}% MATCH</b>
+                            </span>
                           </div>
                         ) : null}
                       </>
