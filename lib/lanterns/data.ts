@@ -189,7 +189,7 @@ export const sectorEchoOrigins: readonly SectorProjectionPoint[] = [
 ];
 
 export const SECTOR_PROJECTION_NOTE =
-  "LOCAL RING PROJECTION // NOT TO SCALE // ROUTE DISTANCES UNRESOLVED";
+  "LOCAL MODEL // RING PROJECTION // NOT TO SCALE // ROUTE DISTANCES UNRESOLVED";
 
 export const constructPrograms: Record<
   ConstructKind,
