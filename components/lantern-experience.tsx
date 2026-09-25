@@ -1131,9 +1131,18 @@ function LanternScreen({
                     <span className="construct-part construct-part--four" />
                   </div>
                   <div className="construct-readout">
-                    <span><small>PROGRAM</small><b>{constructPrograms[construct].name}</b></span>
-                    <span><small>STABILITY</small><b>{construct === "bridge" ? "84.2%" : "98.6%"}</b></span>
-                    <span><small>DRAW</small><b>{construct === "beacon" ? "LOW" : "NOMINAL"}</b></span>
+                    <span>
+                      <small>PROGRAM</small>
+                      <b>{constructPrograms[construct].name}</b>
+                    </span>
+                    <span>
+                      <small>STRUCTURE</small>
+                      <b>{constructPrograms[construct].structure}</b>
+                    </span>
+                    <span>
+                      <small>CLASS</small>
+                      <b>{constructPrograms[construct].trainingClass}</b>
+                    </span>
                   </div>
                 </div>
 
