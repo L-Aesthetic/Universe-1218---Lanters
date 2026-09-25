@@ -48,3 +48,17 @@ export type CaseTimelineEvent = {
   certainty: "exact" | "approximate";
   evidenceId: EvidenceId;
 };
+
+export type SectorProjectionPoint = {
+  x: number;
+  y: number;
+};
+
+export type SectorNode = {
+  id: SectorNodeId;
+  name: string;
+  detail: string;
+  status: string;
+  origin: RecordOrigin;
+  projection?: SectorProjectionPoint;
+};

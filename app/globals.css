@@ -2641,6 +2641,20 @@ button.archive-record:hover,
   margin-top: 36px;
 }
 
+.sector-projection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sector-projection__note {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.48rem;
+  letter-spacing: 0.07em;
+  text-align: center;
+}
+
 .sector-radar {
   aspect-ratio: 1;
   background:
@@ -2680,30 +2694,56 @@ button.archive-record:hover,
 .sector-axis--y { height: 100%; width: 1px; }
 
 .sector-point {
+  appearance: none;
   background: var(--green);
+  border: 0;
   border-radius: 50%;
   box-shadow: 0 0 12px var(--green);
-  height: 7px;
+  cursor: pointer;
+  height: 9px;
+  padding: 0;
   position: absolute;
-  width: 7px;
+  transform: translate(-50%, -50%);
+  width: 9px;
+  z-index: 2;
 }
 
-.sector-point--earth { left: 51%; top: 48%; }
-.sector-point--relay { left: 71%; top: 31%; }
-.sector-point--unknown {
+.sector-point::before {
+  border: 1px solid transparent;
+  border-radius: 50%;
+  content: "";
+  inset: -9px;
+  position: absolute;
+}
+
+.sector-point:hover::before,
+.sector-point:focus-visible::before,
+.sector-point.active::before {
+  border-color: rgba(98, 255, 159, 0.5);
+}
+
+.sector-point--contact {
   background: var(--danger);
   box-shadow: 0 0 14px rgba(255, 202, 116, 0.8);
-  left: 28%;
-  top: 67%;
 }
 
-.sector-point--unknown::after {
+.sector-point--contact::before {
+  border-color: rgba(255, 202, 116, 0.34);
+}
+
+.sector-point--contact::after {
   border: 1px solid var(--danger);
   border-radius: 50%;
   content: "";
-  inset: -10px;
+  inset: -11px;
   position: absolute;
   animation: ping 1.8s infinite;
+}
+
+.sector-point--echo {
+  height: 7px;
+  opacity: 0.78;
+  width: 7px;
 }
 
 .sector-node-stack {
