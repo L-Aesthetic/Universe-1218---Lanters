@@ -377,14 +377,17 @@ export function ConstructViewport({
   /* eslint-enable react-hooks/set-state-in-effect */
 
   return (
-    <div className="construct-viewport">
+    <div
+      className="construct-viewport"
+      role="region"
+      aria-roledescription="3D construct viewport"
+      aria-label={`Interactive three-dimensional ${label}`}
+    >
       <canvas
         ref={canvasRef}
         className="construct-viewport__canvas"
         tabIndex={0}
-        role="application"
-        aria-roledescription="3D construct viewport"
-        aria-label={`Interactive three-dimensional ${label}. Drag to orbit. Pinch or scroll to zoom. Arrow keys rotate; plus and minus zoom.`}
+        aria-label="3D viewport controls. Drag to orbit. Pinch or scroll to zoom. Arrow keys rotate; plus and minus zoom."
       />
       <div className="construct-viewport__instructions" aria-hidden="true">
         DRAG // ORBIT&nbsp;&nbsp;&nbsp; PINCH / WHEEL // RANGE
