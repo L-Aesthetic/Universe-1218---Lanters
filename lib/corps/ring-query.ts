@@ -74,6 +74,7 @@ function toCitation(record: RingKnowledgeRecord): RingCitation {
     id: record.id,
     title: record.title,
     sourceLabel: record.sourceLabel,
+    sourceUrl: record.origin.sourceUrl,
     authority: record.origin.authority,
   };
 }
