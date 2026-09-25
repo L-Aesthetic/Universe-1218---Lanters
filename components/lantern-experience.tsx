@@ -4,9 +4,6 @@ import { useEffect, useState } from "react";
 
 import {
   PLACEHOLDER_SERIAL,
-  VALID_CONSTRUCTS,
-  VALID_EVIDENCE_IDS,
-  VALID_PHASES,
   constructPrograms,
   evidence,
   sectorNodes,
@@ -39,24 +36,6 @@ import type {
   SectorNodeId,
 } from "../lib/lanterns/types";
 import type { RecordOrigin } from "../lib/lanterns/canon";
-
-function isPhase(value: unknown): value is Phase {
-  return typeof value === "string" && VALID_PHASES.includes(value as Phase);
-}
-
-function isEvidenceId(value: unknown): value is EvidenceId {
-  return (
-    typeof value === "string" &&
-    VALID_EVIDENCE_IDS.includes(value as EvidenceId)
-  );
-}
-
-function isConstructKind(value: unknown): value is ConstructKind {
-  return (
-    typeof value === "string" &&
-    VALID_CONSTRUCTS.includes(value as ConstructKind)
-  );
-}
 
 function LanternMark({ compact = false }: { compact?: boolean }) {
   return (
@@ -1314,54 +1293,31 @@ export function LanternExperience() {
     const parsed = loadPersistedState();
 
     if (parsed) {
-      const persistedPhase = isPhase(parsed.phase) ? parsed.phase : "boot";
-      const persistedContactScanned = parsed.contactScanned === true;
-      const persistedCorrelated =
-        parsed.correlated === true || persistedContactScanned;
-      const persistedReviewed = Array.isArray(parsed.reviewed)
-        ? Array.from(new Set(parsed.reviewed.filter(isEvidenceId)))
-        : [];
+      const persistedPhase = parsed.phase ?? "boot";
+      const persistedReviewed = parsed.reviewed ?? [];
 
       setPhase(persistedPhase);
       setReviewed(persistedReviewed);
+      setActiveId(parsed.activeEvidenceId ?? "scene");
+      setLanternName(parsed.lanternName ?? "");
 
-      if (isEvidenceId(parsed.activeEvidenceId)) {
-        setActiveId(parsed.activeEvidenceId);
-      } else if (persistedReviewed.length > 0) {
-        setActiveId(persistedReviewed[persistedReviewed.length - 1]);
-      }
-
-      if (typeof parsed.lanternName === "string") {
-        setLanternName(parsed.lanternName.slice(0, 64));
-      }
-
-      if (
-        typeof parsed.ringSerial === "string" &&
-        /^2814-\d{8}$/.test(parsed.ringSerial)
-      ) {
+      if (parsed.ringSerial) {
         setRingSerial(parsed.ringSerial);
       } else if (persistedPhase === "lantern") {
         setRingSerial(createRingSerial());
       }
 
-      setCorrelated(persistedCorrelated);
-      setContactScanned(persistedContactScanned);
+      setCorrelated(parsed.correlated === true);
+      setContactScanned(parsed.contactScanned === true);
       setSoundEnabled(parsed.soundEnabled !== false);
 
-      if (
-        typeof parsed.selectedAt === "string" &&
-        !Number.isNaN(Date.parse(parsed.selectedAt))
-      ) {
+      if (parsed.selectedAt) {
         setSelectedAt(parsed.selectedAt);
       } else if (persistedPhase === "lantern") {
         setSelectedAt(new Date().toISOString());
       }
 
-      if (Array.isArray(parsed.constructsBuilt)) {
-        setConstructsBuilt(
-          Array.from(new Set(parsed.constructsBuilt.filter(isConstructKind))),
-        );
-      }
+      setConstructsBuilt(parsed.constructsBuilt ?? []);
     }
 
     setHydrated(true);
