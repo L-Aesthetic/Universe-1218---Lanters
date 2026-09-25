@@ -48,10 +48,10 @@ export function deriveCaseIntelligence(input: {
 
   if (reviewed.includes("witness")) {
     findings.push({
-      id: "timeline-conflict",
-      label: "TIMELINE CONFLICT",
+      id: "pre-incident-activity",
+      label: "LOCAL TIMELINE INCOMPLETE",
       detail:
-        "Witness timing and municipal power records do not resolve to the same sequence.",
+        "Witness testimony and camera metadata both place unexplained activity before the municipal incident log begins.",
       confidence: "unresolved",
     });
   }
