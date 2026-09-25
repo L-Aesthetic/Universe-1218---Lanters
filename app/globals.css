@@ -1824,6 +1824,7 @@ input:focus-visible {
   gap: 10px;
 }
 
+.ring-query-launch,
 .ring-audio-toggle {
   background: transparent;
   border: 0;
@@ -1835,9 +1836,25 @@ input:focus-visible {
   padding: 8px 0;
 }
 
+.ring-query-launch {
+  border: 1px solid rgba(98, 255, 159, 0.22);
+  color: #9db1a5;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.08em;
+  padding: 8px 10px;
+}
+
+.ring-query-launch:hover,
+.ring-query-launch[aria-current="page"],
 .ring-audio-toggle:hover,
 .ring-audio-toggle[aria-pressed="true"] {
   color: var(--green-soft);
+}
+
+.ring-query-launch[aria-current="page"] {
+  border-color: rgba(98, 255, 159, 0.52);
 }
 
 
@@ -2056,7 +2073,7 @@ input:focus-visible {
   padding-top: 34px;
 }
 
-.assignment-panel__body > div {
+.assignment-current {
   align-items: flex-start;
   display: flex;
   gap: 18px;
@@ -2143,6 +2160,71 @@ input:focus-visible {
 .assignment-panel dd {
   color: #b5c6bc;
 }
+
+.assignment-sequence {
+  border-top: 1px solid var(--line);
+  margin-top: 22px;
+}
+
+.assignment-sequence__row {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 10px 0;
+}
+
+.assignment-sequence__row > span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.assignment-sequence__row small,
+.assignment-sequence__row b,
+.assignment-sequence__row i {
+  font-family: var(--mono);
+}
+
+.assignment-sequence__row small {
+  color: var(--muted);
+  font-size: 0.47rem;
+  letter-spacing: 0.07em;
+}
+
+.assignment-sequence__row b {
+  color: #b9c9bf;
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+}
+
+.assignment-sequence__row i {
+  color: var(--muted);
+  font-size: 0.48rem;
+  font-style: normal;
+  letter-spacing: 0.07em;
+}
+
+.assignment-sequence__row--complete {
+  opacity: 0.58;
+}
+
+.assignment-sequence__row--complete i,
+.assignment-sequence__row--available i,
+.assignment-sequence__row--active i {
+  color: var(--green-soft);
+}
+
+.assignment-sequence__row--blocked {
+  opacity: 0.38;
+}
+
+.assignment-sequence__row--queued i {
+  color: var(--danger);
+}
+
 
 .ring-dock {
   align-items: center;
@@ -2659,6 +2741,204 @@ button.archive-record:hover,
   margin-top: 12px;
 }
 
+
+.ring-query-layout {
+  display: grid;
+  gap: clamp(30px, 5vw, 72px);
+  grid-template-columns: minmax(280px, 0.82fr) minmax(360px, 1.18fr);
+  margin-top: 38px;
+}
+
+.ring-query-input > p {
+  color: #92a69a;
+  line-height: 1.65;
+  margin: 0 0 28px;
+  max-width: 52ch;
+}
+
+.ring-query-input form {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.ring-query-input label {
+  color: var(--muted);
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.ring-query-input form > div {
+  display: flex;
+}
+
+.ring-query-input input {
+  background: #020704;
+  border: 1px solid var(--line-strong);
+  border-right: 0;
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 52px;
+  min-width: 0;
+  padding: 0 14px;
+  width: 100%;
+}
+
+.ring-query-input form button {
+  background: rgba(98, 255, 159, 0.08);
+  border: 1px solid var(--green);
+  color: var(--green-soft);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  min-width: 76px;
+  padding: 0 14px;
+}
+
+.ring-query-prompts {
+  display: flex;
+  flex-direction: column;
+  margin-top: 18px;
+}
+
+.ring-query-prompts button {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: #82978b;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.54rem;
+  line-height: 1.5;
+  padding: 12px 0;
+  text-align: left;
+}
+
+.ring-query-prompts button:hover {
+  color: var(--green-soft);
+}
+
+.ring-query-response {
+  border-left: 1px solid var(--line);
+  min-height: 430px;
+  padding-left: clamp(24px, 4vw, 48px);
+}
+
+.ring-query-response__classification {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.ring-query-response__classification > span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.48rem;
+  letter-spacing: 0.07em;
+}
+
+.ring-query-response > p {
+  font-size: clamp(1.25rem, 2.4vw, 2.4rem);
+  letter-spacing: -0.035em;
+  line-height: 1.16;
+  margin: 28px 0 34px;
+}
+
+.ring-citations {
+  border-top: 1px solid var(--line);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ring-citations li {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  min-height: 76px;
+  padding: 12px 0;
+}
+
+.ring-citations li > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ring-citations small,
+.ring-citations b,
+.ring-citations em,
+.ring-citations a,
+.ring-citations i {
+  font-family: var(--mono);
+}
+
+.ring-citations small {
+  color: var(--muted);
+  font-size: 0.44rem;
+  letter-spacing: 0.07em;
+}
+
+.ring-citations b {
+  color: #bdcec4;
+  font-size: 0.62rem;
+}
+
+.ring-citations em {
+  color: #74897d;
+  font-size: 0.5rem;
+  font-style: normal;
+}
+
+.ring-citations a,
+.ring-citations i {
+  color: var(--green-soft);
+  flex: 0 0 auto;
+  font-size: 0.48rem;
+  font-style: normal;
+  text-decoration: none;
+}
+
+.ring-query-empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  min-height: 360px;
+  text-align: center;
+}
+
+.ring-query-empty .lantern-mark {
+  opacity: 0.42;
+}
+
+.ring-query-empty b,
+.ring-query-empty span {
+  font-family: var(--mono);
+}
+
+.ring-query-empty b {
+  color: #b5c6bc;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  margin-top: 18px;
+}
+
+.ring-query-empty span {
+  color: var(--muted);
+  font-size: 0.54rem;
+  line-height: 1.55;
+  margin-top: 8px;
+  max-width: 360px;
+}
 
 .sector-field {
   align-items: center;
@@ -3332,8 +3612,17 @@ button.archive-record:hover,
   .field-case-grid,
   .sector-field,
   .construct-layout,
-  .archive-workspace {
+  .archive-workspace,
+  .ring-query-layout {
     grid-template-columns: 1fr;
+  }
+
+  .ring-query-response {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    min-height: 320px;
+    padding-left: 0;
+    padding-top: 24px;
   }
 
   .archive-inspector {
