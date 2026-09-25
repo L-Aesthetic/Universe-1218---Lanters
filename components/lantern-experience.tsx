@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { CorpsNetworkPanel } from "./corps-network-panel";
+
 import {
   CASE_CLOCK,
   PLACEHOLDER_SERIAL,
@@ -836,6 +838,14 @@ function LanternScreen({
               ASK RING
             </button>
             <button
+              className="ring-query-launch"
+              type="button"
+              onClick={() => openSystem("corps")}
+              aria-current={system === "corps" ? "page" : undefined}
+            >
+              CORPS
+            </button>
+            <button
               className="ring-audio-toggle"
               type="button"
               onClick={() => {
@@ -1385,6 +1395,14 @@ function LanternScreen({
                 </div>
               </div>
             </section>
+          )}
+
+          {system === "corps" && (
+            <CorpsNetworkPanel
+              snapshot={LOCAL_CORPS_SNAPSHOT}
+              assignment={currentAssignment}
+              ringSerial={ringSerial}
+            />
           )}
 
           {system === "ask" && (
