@@ -36,6 +36,7 @@ export type RingCitation = {
   id: string;
   title: string;
   sourceLabel: string;
+  sourceUrl?: string;
   authority: RecordOrigin["authority"];
 };
 
