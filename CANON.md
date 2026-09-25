@@ -56,7 +56,7 @@ The current selection-ring study is informed by the licensed *Lanterns* power-ri
 
 The site does not ship those product photos. The procedural study separates the physical ring from emitted energy:
 
-- dark metal body/band
+- gold IP-plated stainless-steel body/band
 - gold-tone face structure
 - green enamel/inlay treatment
 - concentric central geometry
