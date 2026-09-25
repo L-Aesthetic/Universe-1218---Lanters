@@ -1176,36 +1176,68 @@ function LanternScreen({
         <nav className="ring-dock" aria-label="Lantern systems">
           <button
             type="button"
-            className={`ring-dock__item ${system === "case" ? "ring-dock__item--active" : ""}`}
+            className={[
+              "ring-dock__item",
+              system === "case" ? "ring-dock__item--active" : "",
+              caseIntel.recommendedSystem === "case" && system !== "case"
+                ? "ring-dock__item--recommended"
+                : "",
+            ].filter(Boolean).join(" ")}
+            aria-current={system === "case" ? "page" : undefined}
             onClick={() => openSystem("case")}
           >
             <i>01</i><b>CASE</b>
+            {caseIntel.recommendedSystem === "case" && system !== "case" ? (
+              <small>NEXT</small>
+            ) : null}
           </button>
           <button
             type="button"
-            className={`ring-dock__item ${system === "archive" ? "ring-dock__item--active" : ""}`}
+            className={[
+              "ring-dock__item",
+              system === "archive" ? "ring-dock__item--active" : "",
+              caseIntel.recommendedSystem === "archive" && system !== "archive"
+                ? "ring-dock__item--recommended"
+                : "",
+            ].filter(Boolean).join(" ")}
+            aria-current={system === "archive" ? "page" : undefined}
             onClick={() => openSystem("archive")}
           >
             <i>02</i><b>ARCHIVE</b>
+            {caseIntel.recommendedSystem === "archive" && system !== "archive" ? (
+              <small>NEXT</small>
+            ) : null}
           </button>
           <button
             type="button"
             className={`ring-dock__core ${system === "record" ? "ring-dock__core--active" : ""}`}
             onClick={() => openSystem("record")}
+            aria-current={system === "record" ? "page" : undefined}
             aria-label="Open Lantern service record"
           >
             <LanternMark compact />
           </button>
           <button
             type="button"
-            className={`ring-dock__item ${system === "sector" ? "ring-dock__item--active" : ""}`}
+            className={[
+              "ring-dock__item",
+              system === "sector" ? "ring-dock__item--active" : "",
+              caseIntel.recommendedSystem === "sector" && system !== "sector"
+                ? "ring-dock__item--recommended"
+                : "",
+            ].filter(Boolean).join(" ")}
+            aria-current={system === "sector" ? "page" : undefined}
             onClick={() => openSystem("sector")}
           >
             <i>03</i><b>SECTOR</b>
+            {caseIntel.recommendedSystem === "sector" && system !== "sector" ? (
+              <small>NEXT</small>
+            ) : null}
           </button>
           <button
             type="button"
             className={`ring-dock__item ${system === "construct" ? "ring-dock__item--active" : ""}`}
+            aria-current={system === "construct" ? "page" : undefined}
             onClick={() => openSystem("construct")}
           >
             <i>04</i><b>CONSTRUCT</b>
