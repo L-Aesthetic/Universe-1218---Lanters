@@ -1698,18 +1698,21 @@ input:focus-visible {
   padding-top: 18px;
 }
 
-.service-log > div:last-child {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 0.7fr 1fr 1.35fr;
+.service-events {
+  border-top: 1px solid var(--line);
   margin-top: 12px;
 }
 
-.service-log span {
-  background: rgba(98, 255, 159, 0.03);
-  border: 1px solid var(--line);
-  min-height: 58px;
-  padding: 10px;
+.service-event {
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 0.65fr 1fr 1.4fr;
+  padding: 13px 0;
+}
+
+.service-event span {
+  min-width: 0;
 }
 
 .service-log small,
@@ -1720,15 +1723,16 @@ input:focus-visible {
 
 .service-log small {
   color: var(--muted);
-  font-size: 0.44rem;
+  font-size: 0.5rem;
   letter-spacing: 0.07em;
 }
 
 .service-log b {
   color: var(--green-soft);
-  font-size: 0.55rem;
+  font-size: 0.59rem;
   line-height: 1.45;
-  margin-top: 7px;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
 }
 
 .assignment-panel {
@@ -1781,7 +1785,7 @@ input:focus-visible {
 }
 
 .assignment-panel__body p {
-  font-size: clamp(1.5rem, 3vw, 3.1rem);
+  font-size: clamp(1.2rem, 2.1vw, 2.1rem);
   font-weight: 450;
   letter-spacing: -0.045em;
   line-height: 1.05;
@@ -3235,8 +3239,10 @@ button.archive-record:hover,
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .service-log > div:last-child {
+  .service-event {
+    gap: 10px;
     grid-template-columns: 1fr;
+    padding: 14px 0;
   }
 
   .record-grid span:nth-child(3n + 2),
@@ -3255,7 +3261,8 @@ button.archive-record:hover,
   }
 
   .assignment-panel__body p {
-    font-size: 2rem;
+    font-size: 1.25rem;
+    line-height: 1.25;
   }
 
   .system-panel {
