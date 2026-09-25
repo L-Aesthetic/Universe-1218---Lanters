@@ -1,3 +1,4 @@
+import { WAVEFORM_MATCH_PERCENT } from "./waveform";
 import type {
   EvidenceId,
   RingSystem,
@@ -70,7 +71,7 @@ export function deriveCaseIntelligence(input: {
       id: "waveform-match",
       label: "WAVEFORM MATCH",
       detail:
-        "Current and historical traces share a 91.4% non-random harmonic correlation.",
+        `Current and historical traces share a ${WAVEFORM_MATCH_PERCENT}% Pearson correlation across the stored sample set.`,
       confidence: "correlated",
     });
   }
