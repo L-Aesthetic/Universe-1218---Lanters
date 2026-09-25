@@ -563,6 +563,23 @@ function LanternScreen({
     contactScanned,
   });
 
+  const serviceEvents = [
+    correlated
+      ? {
+          action: "WAVEFORM CORRELATION",
+          result: "91.4% MATCH // OFF-WORLD ORIGIN",
+        }
+      : null,
+    contactScanned
+      ? {
+          action: "REMOTE CONTACT SCAN",
+          result: "ONE SIGNATURE // THREE ORIGINS",
+        }
+      : null,
+  ].filter(
+    (event): event is { action: string; result: string } => event !== null,
+  );
+
   const feedback = (kind: "soft" | "confirm" | "alert") =>
     ringFeedback(kind, { sound: soundEnabled });
 
@@ -734,38 +751,29 @@ function LanternScreen({
                         <span><small>ASSIGNMENTS</small><b>01</b></span>
                         <span><small>CONSTRUCTS</small><b>{String(constructsBuilt.length).padStart(2, "0")}</b></span>
                       </div>
-                      {correlated ? (
+                      {serviceEvents.length > 0 ? (
                         <div className="service-log">
                           <div className="eyebrow">SERVICE LOG // FIELD RECORD</div>
-                          <div>
-                            <span>
-                              <small>CASE</small>
-                              <b>2814-E/001</b>
-                            </span>
-                            <span>
-                              <small>ACTION</small>
-                              <b>WAVEFORM CORRELATION</b>
-                            </span>
-                            <span>
-                              <small>RESULT</small>
-                              <b>91.4% MATCH // OFF-WORLD ORIGIN</b>
-                            </span>
-                            {contactScanned ? (
-                              <>
+                          <div className="service-events">
+                            {serviceEvents.map((event) => (
+                              <div className="service-event" key={event.action}>
                                 <span>
                                   <small>CASE</small>
-                                  <b>2814-E/001</b>
+                                  <b>{CASE_META.id}</b>
                                 </span>
                                 <span>
                                   <small>ACTION</small>
-                                  <b>REMOTE CONTACT SCAN</b>
+                                  <b>{event.action}</b>
                                 </span>
                                 <span>
                                   <small>RESULT</small>
-                                  <b>MULTIPLE ORIGINS // SINGLE SIGNATURE</b>
+                                  <b>{event.result}</b>
                                 </span>
-                              </>
-                            ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
                           </div>
                         </div>
                       ) : null}
