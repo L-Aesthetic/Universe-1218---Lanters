@@ -257,4 +257,11 @@ test("construct training uses the interactive 3D renderer", async ({ page }) => 
     "aria-label",
     /interactive three-dimensional distress beacon/i,
   );
+
+  const results = await new AxeBuilder({ page }).analyze();
+  const blocking = results.violations.filter((violation) =>
+    ["serious", "critical"].includes(violation.impact ?? ""),
+  );
+
+  expect(blocking).toEqual([]);
 });
