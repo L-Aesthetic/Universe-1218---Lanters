@@ -51,6 +51,9 @@ test("case intelligence advances instead of leaving stale objectives", async ({
 
   await expect(page.getByText(/91.4%/i)).toBeVisible();
   await expect(
+    page.locator(".ring-dock__item--recommended").filter({ hasText: "SECTOR" }),
+  ).toBeVisible();
+  await expect(
     page.getByRole("button", { name: /trace matching signal/i }),
   ).toBeVisible();
 
@@ -76,4 +79,19 @@ test("boot screen has no serious or critical axe violations", async ({ page }) =
   );
 
   expect(blocking).toEqual([]);
+});
+
+
+test("selection remains operable on a short viewport", async ({ page }) => {
+  await reachSelection(page);
+
+  const accept = page.getByRole("button", { name: /put on the ring/i });
+  await accept.scrollIntoViewIfNeeded();
+  await expect(accept).toBeVisible();
+
+  const box = await accept.boundingBox();
+  expect(box).not.toBeNull();
+  expect((box?.y ?? 9999) + (box?.height ?? 0)).toBeLessThanOrEqual(
+    page.viewportSize()?.height ?? 640,
+  );
 });
