@@ -111,6 +111,8 @@ test("case reconstruction reveals only reviewed timeline evidence", async ({ pag
   await page.getByRole("button", { name: /the light came first/i }).click();
 
   await expect(page.getByText(/power outage logged/i)).toBeVisible();
-  await expect(page.getByText(/camera metadata corruption/i)).toBeVisible();
+  await expect(
+    page.getByText("CAMERA METADATA CORRUPTION", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText(/local timeline is incomplete/i)).toBeVisible();
 });
