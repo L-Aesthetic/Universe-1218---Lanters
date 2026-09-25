@@ -255,6 +255,12 @@ function CaseScreen({
   const visibleTimeline = caseTimeline.filter((event) =>
     reviewed.includes(event.evidenceId),
   );
+  const [timelineCursor, setTimelineCursor] = useState(0);
+  const safeTimelineCursor = Math.min(
+    timelineCursor,
+    Math.max(visibleTimeline.length - 1, 0),
+  );
+  const activeTimelineEvent = visibleTimeline[safeTimelineCursor];
 
   return (
     <section className="screen screen--case">
@@ -306,29 +312,83 @@ function CaseScreen({
               </span>
             </div>
 
-            <figure className="forensic-field">
+            <figure
+              className={[
+                "forensic-field",
+                activeTimelineEvent
+                  ? `forensic-field--${activeTimelineEvent.id}`
+                  : "forensic-field--empty",
+              ].join(" ")}
+            >
               <div aria-hidden="true">
                 <span className="forensic-grid" />
-                <span className="forensic-body">
-                  <i className="body-head" />
-                  <i className="body-spine" />
-                  <i className="body-arm body-arm--left" />
-                  <i className="body-arm body-arm--right" />
-                  <i className="body-leg body-leg--left" />
-                  <i className="body-leg body-leg--right" />
+
+                {!activeTimelineEvent ? (
+                  <span className="forensic-empty">
+                    OPEN A RECORD TO BEGIN RECONSTRUCTION
+                  </span>
+                ) : null}
+
+                {activeTimelineEvent?.id === "emission" ? (
+                  <>
+                    <span className="forensic-later-position">
+                      LATER BODY POSITION
+                    </span>
+                    <span className="forensic-origin">
+                      <i />
+                      <b>UNKNOWN EMISSION</b>
+                      <small>11.7 M NORTH OF LATER BODY POSITION</small>
+                    </span>
+                  </>
+                ) : null}
+
+                {activeTimelineEvent?.id === "witness-flash" ? (
+                  <span className="forensic-witness-zone">
+                    <i />
+                    <b>LIGHT REPORTED</b>
+                    <small>POSITION NOT RECORDED</small>
+                  </span>
+                ) : null}
+
+                {activeTimelineEvent?.id === "camera-corruption" ? (
+                  <span className="forensic-camera-state">
+                    <b>CAMERA METADATA FAILURE</b>
+                    <small>IMAGE CONTENT CANNOT BE RELIABLY RECONSTRUCTED</small>
+                  </span>
+                ) : null}
+
+                {activeTimelineEvent?.id === "grid-outage" ? (
+                  <span className="forensic-outage-state">
+                    <b>MUNICIPAL GRID LOSS</b>
+                    <small>LOCAL INCIDENT LOG BEGINS HERE</small>
+                  </span>
+                ) : null}
+
+                {activeTimelineEvent?.id === "body-discovered" ? (
+                  <>
+                    <span className="forensic-body">
+                      <i className="body-head" />
+                      <i className="body-spine" />
+                      <i className="body-arm body-arm--left" />
+                      <i className="body-arm body-arm--right" />
+                      <i className="body-leg body-leg--left" />
+                      <i className="body-leg body-leg--right" />
+                    </span>
+                    <span className="forensic-discovery-label">
+                      <b>BODY POSITION RECORDED</b>
+                      <small>EMISSION WAS 04:00 EARLIER</small>
+                    </span>
+                  </>
+                ) : null}
+
+                <span className="forensic-time">
+                  {activeTimelineEvent?.time ?? "--:--:--.---"}
                 </span>
-                <span className="forensic-origin">
-                  <i />
-                  <b>UNKNOWN EMISSION</b>
-                  <small>11.7 M</small>
-                </span>
-                <span className="forensic-time">{CASE_CLOCK.emission}</span>
               </div>
               <figcaption className="sr-only">
-                Two-dimensional ring telemetry reconstruction of the Rushville
-                scene. The body position is known; an anomalous emission was
-                measured 11.7 meters north of the victim. Unknown movement is
-                deliberately not drawn.
+                {activeTimelineEvent
+                  ? `Two-dimensional ring reconstruction at ${activeTimelineEvent.time}. ${activeTimelineEvent.label}. ${activeTimelineEvent.detail}`
+                  : "No reconstruction is available until a case record is reviewed."}
               </figcaption>
             </figure>
 
@@ -353,21 +413,62 @@ function CaseScreen({
                 </span>
                 <i>{String(visibleTimeline.length).padStart(2, "0")} EVENTS</i>
               </div>
-              <ol>
-                {visibleTimeline.map((event) => (
-                  <li key={event.id}>
-                    <time>{event.time}</time>
-                    <span>
-                      <small>
-                        {event.source}
-                        {event.certainty === "approximate" ? " // APPROX." : ""}
-                      </small>
-                      <b>{event.label}</b>
-                      <p>{event.detail}</p>
-                    </span>
-                  </li>
-                ))}
-              </ol>
+              {visibleTimeline.length > 0 ? (
+                <>
+                  <label className="case-timeline__scrubber">
+                    <span className="sr-only">Reconstruction event</span>
+                    <input
+                      type="range"
+                      min={0}
+                      max={Math.max(visibleTimeline.length - 1, 0)}
+                      step={1}
+                      value={safeTimelineCursor}
+                      onChange={(event) =>
+                        setTimelineCursor(Number(event.target.value))
+                      }
+                      aria-valuetext={
+                        activeTimelineEvent
+                          ? `${activeTimelineEvent.time}, ${activeTimelineEvent.label}`
+                          : "No event selected"
+                      }
+                    />
+                  </label>
+                  <ol>
+                    {visibleTimeline.map((event, index) => (
+                      <li
+                        className={
+                          index === safeTimelineCursor
+                            ? "case-timeline__event case-timeline__event--active"
+                            : "case-timeline__event"
+                        }
+                        key={event.id}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setTimelineCursor(index)}
+                          aria-pressed={index === safeTimelineCursor}
+                        >
+                          <time>{event.time}</time>
+                          <span>
+                            <small>
+                              {event.source}
+                              {event.certainty === "approximate"
+                                ? " // APPROX."
+                                : ""}
+                            </small>
+                            <b>{event.label}</b>
+                            <p>{event.detail}</p>
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : (
+                <p className="case-timeline__empty">
+                  No sequence has been reconstructed yet.
+                </p>
+              )}
             </section>
 
             {complete ? (
